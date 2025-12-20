@@ -45,6 +45,8 @@ const io = new Server(httpServer, {
       'http://localhost:5173',
       'http://localhost:3000',
       'https://cinemax-beta-ten.vercel.app',
+      'https://cinimaxx.vercel.app',
+      'https://cinimax.vercel.app',
       'https://www.cinexp.app',
       'https://cinematic-popcorn-theatre-experience.vercel.app',
       'https://cinematic-popcorn-park.vercel.app',
@@ -84,6 +86,8 @@ const allowedOrigins = [
   'https://cinemax-beta-ten.vercel.app',
   'https://www.cinexp.app',
   'https://cinexp.app',
+  'https://cinimax.vercel.app',
+  'https://cinimaxx.vercel.app',
   'https://cinematic-popcorn-theatre-experience.vercel.app',
   'https://cinematic-popcorn-park.vercel.app',
 ];
@@ -110,7 +114,7 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'Cache-Control', 'Pragma', 'X-Requested-With'],
 }));
 
 // Handle preflight requests explicitly
