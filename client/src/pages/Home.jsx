@@ -168,10 +168,12 @@ const Home = () => {
       // First, trigger archiving of past showtimes (with retry for cold starts)
       console.log("Triggering archive check before fetching movies");
       try {
+        const token = localStorage.getItem('access_token');
         await retryRequest(() => 
           axios.post(`${backendUrl}/api/showtimes/force-archive`, {}, {
             withCredentials: true,
             timeout: 30000, // 30 second timeout for cold starts
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {},
           })
         );
         console.log("Archive process completed");

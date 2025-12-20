@@ -1,7 +1,8 @@
+// Load environment variables FIRST - must use this import syntax for ES modules
+import 'dotenv/config';
 
 import express from 'express';
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { createServer } from 'http';
@@ -30,8 +31,6 @@ import Showtime from './models/showtime.model.js';
 import { archivePastShowtimes, generateNextDayShowtimes, reopenAllShowtimes } from './controllers/showtime.controller.js';
 import { releaseExpiredHolds } from './controllers/seat.controller.js';
 import { releaseExpiredParkingHolds } from './controllers/parking.controller.js';
-
-dotenv.config();
 
 const app = express();
 const httpServer = createServer(app);

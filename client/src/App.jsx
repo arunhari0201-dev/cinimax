@@ -69,11 +69,13 @@ export default function App() {
         
         try {
           console.log('🔍 Validating session for user:', currentUser.username);
+          const token = localStorage.getItem('access_token');
           const response = await fetch(`${backendUrl}/api/auth/validate-session`, {
             method: 'GET',
             credentials: 'include',
             headers: {
               'Content-Type': 'application/json',
+              ...(token && { 'Authorization': `Bearer ${token}` }),
             },
           });
           

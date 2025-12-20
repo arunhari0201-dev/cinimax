@@ -1,10 +1,8 @@
 import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import multer from 'multer';
-import dotenv from 'dotenv';
 
-// Load environment variables
-dotenv.config();
+// Environment variables should be loaded by the main index.js before this module is imported
 
 const requiredCloudinaryVars = [
   'CLOUDINARY_CLOUD_NAME',
