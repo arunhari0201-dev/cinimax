@@ -266,13 +266,7 @@ const Tickets = () => {
       const timestamp = Date.now();
       const randomParam = Math.random().toString(36).substring(7);
       const seatsRes = await axios.get(`${backendUrl}/api/seats/showtime/${showtimeId}?_t=${timestamp}&_r=${randomParam}&nocache=true`, {
-        withCredentials: true,
-        headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0',
-          'If-Modified-Since': 'Mon, 26 Jul 1997 05:00:00 GMT'
-        }
+        withCredentials: true
       });
       console.log('🎯 Fresh seats fetched from API:', seatsRes.data);
       console.log('🔢 Number of seats:', seatsRes.data.length);
