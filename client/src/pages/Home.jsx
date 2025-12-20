@@ -133,6 +133,30 @@ const Home = () => {
     }
   };
 
+  // Helper function to retry requests with exponential backoff (for Render cold starts)
+  const retryRequest = async (requestFn, maxRetries = 3, initialDelay = 2000) => {
+    let lastError;
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        return await requestFn();
+      } catch (error) {
+        lastError = error;
+        const isServerDown = error.response?.status === 503 || 
+                            error.code === 'ERR_NETWORK' ||
+                            error.message?.includes('Network Error');
+        
+        if (isServerDown && attempt < maxRetries - 1) {
+          const delay = initialDelay * Math.pow(2, attempt);
+          console.log(`Server might be waking up... Retry ${attempt + 1}/${maxRetries} in ${delay/1000}s`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        } else {
+          throw error;
+        }
+      }
+    }
+    throw lastError;
+  };
+
   const fetchMovies = async () => {
     setLoading(true);
     try {
@@ -141,22 +165,28 @@ const Home = () => {
           ? 'https://cinematic-popcorn-theatre-experience-3.onrender.com' 
           : 'http://localhost:5000';
       
-      // First, trigger archiving of past showtimes
+      // First, trigger archiving of past showtimes (with retry for cold starts)
       console.log("Triggering archive check before fetching movies");
       try {
-        await axios.post(`${backendUrl}/api/showtimes/force-archive`, {}, {
-          withCredentials: true,
-        });
+        await retryRequest(() => 
+          axios.post(`${backendUrl}/api/showtimes/force-archive`, {}, {
+            withCredentials: true,
+            timeout: 30000, // 30 second timeout for cold starts
+          })
+        );
         console.log("Archive process completed");
       } catch (archiveErr) {
         console.error("Error running archive process:", archiveErr);
         // Continue anyway to show available movies
       }
           
-      // Now fetch the updated movie list
-      const response = await axios.get(`${backendUrl}/api/movies`, {
-        withCredentials: true,
-      });
+      // Now fetch the updated movie list (with retry for cold starts)
+      const response = await retryRequest(() => 
+        axios.get(`${backendUrl}/api/movies`, {
+          withCredentials: true,
+          timeout: 30000, // 30 second timeout for cold starts
+        })
+      );
 
       // The response now includes movies with their showtimes
       console.log(`Fetched ${response.data.length} movies`);
@@ -189,7 +219,14 @@ const Home = () => {
       setError(null);
     } catch (err) {
       console.error("Error fetching movies:", err);
-      setError('Failed to fetch movies');
+      const isServerDown = err.response?.status === 503 || 
+                          err.code === 'ERR_NETWORK' ||
+                          err.message?.includes('Network Error');
+      if (isServerDown) {
+        setError('Server is starting up. Please refresh in 30-60 seconds.');
+      } else {
+        setError('Failed to fetch movies. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

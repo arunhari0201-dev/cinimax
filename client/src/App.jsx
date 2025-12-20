@@ -105,6 +105,31 @@ export default function App() {
     }
   }, [currentUser, dispatch, skipSessionValidation]);
 
+  // Wake up the backend server on app load (Render free tier goes to sleep)
+  useEffect(() => {
+    const wakeUpServer = async () => {
+      const backendUrl = 
+        process.env.NODE_ENV === 'production' 
+          ? 'https://cinematic-popcorn-theatre-experience-3.onrender.com' 
+          : 'http://localhost:5000';
+      
+      try {
+        console.log('🔄 Waking up backend server...');
+        const response = await fetch(`${backendUrl}/health`, {
+          method: 'GET',
+          mode: 'cors',
+        });
+        if (response.ok) {
+          console.log('✅ Backend server is awake');
+        }
+      } catch (error) {
+        console.log('⏳ Backend server is starting up, may take 30-60 seconds...');
+      }
+    };
+    
+    wakeUpServer();
+  }, []);
+
   // Initialize and clean up socket connection
   useEffect(() => {
     // Connect to socket server on app load

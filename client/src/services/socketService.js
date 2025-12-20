@@ -19,7 +19,12 @@ export const initSocket = () => {
     socket = io(backendUrl, {
       withCredentials: true,
       autoConnect: false,
-      transports: ['websocket', 'polling'],
+      transports: ['polling', 'websocket'], // Start with polling (more reliable for cold starts)
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 3000,      // Wait 3 seconds before first retry
+      reconnectionDelayMax: 30000,  // Max 30 seconds between retries
+      timeout: 30000,               // 30 second timeout for cold starts
     });
 
     // Set up default socket event listeners
@@ -28,7 +33,11 @@ export const initSocket = () => {
     });
 
     socket.on('connect_error', (error) => {
-      console.error('Socket connection error:', error);
+      // Suppress excessive logging for cold start scenarios
+      if (!socket._coldStartLogged) {
+        console.warn('Socket connection error (server may be waking up):', error.message);
+        socket._coldStartLogged = true;
+      }
     });
 
     socket.on('disconnect', (reason) => {
