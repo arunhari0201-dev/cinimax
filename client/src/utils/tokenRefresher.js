@@ -19,17 +19,25 @@ export const refreshToken = async () => {
       return false;
     }
     
+    // Get token from localStorage
+    const token = localStorage.getItem('access_token');
+    
     // Try to refresh token
     const refreshResponse = await axios.post(`${backendUrl}/api/auth/refresh-token`, {
       userId: currentUser._id
     }, { 
       withCredentials: true,
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` })
       }
     });
     
     if (refreshResponse.data) {
+      // Store new token if returned
+      if (refreshResponse.data.token) {
+        localStorage.setItem('access_token', refreshResponse.data.token);
+      }
       // Update Redux store with refreshed user data
       store.dispatch(signInSuccess(refreshResponse.data));
       return true;
@@ -42,6 +50,7 @@ export const refreshToken = async () => {
     // If refresh fails with 401/403, sign out the user
     if (error.response?.status === 401 || error.response?.status === 403) {
       store.dispatch(signOut());
+      localStorage.removeItem('access_token');
       
       // Clear cookies
       document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + window.location.hostname + '; secure; samesite=none';
@@ -53,9 +62,23 @@ export const refreshToken = async () => {
 };
 
 /**
- * Sets up an axios interceptor to automatically refresh tokens on 401/403 errors
+ * Sets up axios interceptors to automatically:
+ * 1. Add Authorization header to all requests
+ * 2. Refresh tokens on 401/403 errors
  */
 export const setupTokenRefreshInterceptor = () => {
+  // Add request interceptor to automatically add Authorization header
+  axios.interceptors.request.use(
+    (config) => {
+      const token = localStorage.getItem('access_token');
+      if (token && !config.headers['Authorization']) {
+        config.headers['Authorization'] = `Bearer ${token}`;
+      }
+      return config;
+    },
+    (error) => Promise.reject(error)
+  );
+
   // Add response interceptor for automatic token refresh
   axios.interceptors.response.use(
     (response) => response,
@@ -74,6 +97,11 @@ export const setupTokenRefreshInterceptor = () => {
           const refreshed = await refreshToken();
           
           if (refreshed) {
+            // Update the Authorization header with new token
+            const newToken = localStorage.getItem('access_token');
+            if (newToken) {
+              originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+            }
             // Retry the original request
             return axios(originalRequest);
           }

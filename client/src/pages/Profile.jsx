@@ -85,6 +85,9 @@ export default function Profile() {
     setLoadingBookings(true);
     setBookingError(null);
     
+    // Get token from localStorage for Authorization header
+    const token = localStorage.getItem('access_token');
+    
     try {
       // Use the correct booking endpoint
       const response = await axios.get(
@@ -92,7 +95,8 @@ export default function Profile() {
         { 
           withCredentials: true,
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            ...(token && { 'Authorization': `Bearer ${token}` })
           }
         }
       );
@@ -110,7 +114,10 @@ export default function Profile() {
           // Try to refresh the token
           const refreshResponse = await axios.post(`${backendUrl}/api/auth/refresh-token`, {
             userId: currentUser._id
-          }, { withCredentials: true });
+          }, { 
+            withCredentials: true,
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+          });
           
           if (refreshResponse.data) {
             console.log('Token refreshed successfully, retrying booking fetch');
@@ -120,7 +127,8 @@ export default function Profile() {
               { 
                 withCredentials: true,
                 headers: {
-                  'Content-Type': 'application/json'
+                  'Content-Type': 'application/json',
+                  ...(token && { 'Authorization': `Bearer ${token}` })
                 }
               }
             );
