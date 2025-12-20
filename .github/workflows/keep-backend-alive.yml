@@ -36,7 +36,7 @@ jobs:
         run: |
           set -uo pipefail
 
-          DEFAULT_URL="https://cinematic-popcorn-theatre-experience-3.onrender.com"
+          DEFAULT_URL="https://cinimax.onrender.com"
           BACKEND_URL="${BACKEND_URL:-$DEFAULT_URL}"
 
           DEFAULT_INTERVAL=300

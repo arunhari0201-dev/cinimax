@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const backendUrl = 
   process.env.NODE_ENV === 'production' 
-    ? 'https://cinematic-popcorn-theatre-experience-3.onrender.com' 
+    ? 'https://cinimax.onrender.com' 
     : 'http://localhost:5000';
 
 // Function to validate current authentication status

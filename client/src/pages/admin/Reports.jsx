@@ -43,7 +43,7 @@ export default function Reports() {
 
   const backendUrl = 
     process.env.NODE_ENV === 'production' 
-      ? 'https://cinematic-popcorn-theatre-experience-3.onrender.com' 
+      ? 'https://cinimax.onrender.com' 
       : 'http://localhost:5000';
 
   const COLORS = ['#C8A951', '#E50914', '#00C853', '#FF9800', '#9C27B0', '#2196F3'];

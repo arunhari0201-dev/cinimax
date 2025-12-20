@@ -9,7 +9,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://cinematic-popcorn-theatre-experience-3.onrender.com',  // Production backend URL
+        target: 'https://cinimax.onrender.com',  // Production backend URL
         changeOrigin: true,
         secure: false,
       },

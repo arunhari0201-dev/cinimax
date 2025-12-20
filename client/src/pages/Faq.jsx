@@ -54,7 +54,7 @@ const FAQ = () => {
     try {
       const backendUrl = 
         process.env.NODE_ENV === 'production' 
-          ? 'https://cinematic-popcorn-theatre-experience-3.onrender.com' 
+          ? 'https://cinimax.onrender.com' 
           : 'http://localhost:5000';
 
       const response = await axios.post(`${backendUrl}/api/faq/ask`, {
@@ -100,7 +100,7 @@ const FAQ = () => {
     try {
       const backendUrl = 
         process.env.NODE_ENV === 'production' 
-          ? 'https://cinematic-popcorn-theatre-experience-3.onrender.com' 
+          ? 'https://cinimax.onrender.com' 
           : 'http://localhost:5000';
 
       const response = await axios.post(`${backendUrl}/api/contact/submit`, {
