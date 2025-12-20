@@ -93,6 +93,12 @@ export const signin = async (req, res, next) => {
       .cookie('access_token', token, cookieOptions)
       .status(200)
       .json({ ...rest, token });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const google = async (req, res, next) => {
   try {
     const user = await User.findOne({ email: req.body.email });
     if (user) {
