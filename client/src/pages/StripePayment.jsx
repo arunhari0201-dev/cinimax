@@ -78,6 +78,10 @@ const PaymentForm = ({ bookingData, onPaymentSuccess }) => {
       
       try {
         console.log('💳 Creating payment intent for user:', currentUser.email);
+        
+        // Get token from localStorage for Authorization header
+        const token = localStorage.getItem('access_token');
+        
         const response = await axios.post(`${backendUrl}/api/stripe/create-payment-intent`, {
           amount: bookingData.totalCost,
           currency: 'inr',
@@ -88,7 +92,10 @@ const PaymentForm = ({ bookingData, onPaymentSuccess }) => {
             seats: bookingData.seats,
             parkingSlots: bookingData.parkingSlots
           }
-        }, { withCredentials: true });
+        }, { 
+          withCredentials: true,
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
 
         setClientSecret(response.data.clientSecret);
         console.log('✅ Payment intent created successfully');

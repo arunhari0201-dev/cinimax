@@ -92,13 +92,7 @@ export const signin = async (req, res, next) => {
     res
       .cookie('access_token', token, cookieOptions)
       .status(200)
-      .json(rest);
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const google = async (req, res, next) => {
+      .json({ ...rest, token });
   try {
     const user = await User.findOne({ email: req.body.email });
     if (user) {
@@ -121,7 +115,7 @@ export const google = async (req, res, next) => {
       res
         .cookie('access_token', token, cookieOptions)
         .status(200)
-        .json(rest);
+        .json({ ...rest, token });
     } else {
       const newUser = new User({
         username:
@@ -148,7 +142,7 @@ export const google = async (req, res, next) => {
       res
         .cookie('access_token', token, cookieOptions)
         .status(200)
-        .json(rest);
+        .json({ ...rest, token });
     }
   } catch (error) {
     next(error);

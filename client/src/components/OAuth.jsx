@@ -34,6 +34,13 @@ export default function OAuth() {
 
       const data = await res.json();
       console.log(data);
+      
+      // Store token in localStorage for cross-origin requests
+      if (data.token) {
+        localStorage.setItem('access_token', data.token);
+        console.log('🔑 Token stored in localStorage');
+      }
+      
       dispatch(signInSuccess(data));
       navigate('/');
     } catch (error) {

@@ -49,6 +49,13 @@ export default function SignIn() {
         dispatch(signInFailure(data));
         return;
       }
+      
+      // Store token in localStorage for cross-origin requests
+      if (data.token) {
+        localStorage.setItem('access_token', data.token);
+        console.log('🔑 Token stored in localStorage');
+      }
+      
       dispatch(signInSuccess(data));
       
       // Check user role and redirect accordingly
