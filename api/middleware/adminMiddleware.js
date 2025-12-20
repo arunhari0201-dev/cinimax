@@ -5,7 +5,16 @@ import { errorHandler } from '../utils/error.js';
 // Middleware to verify admin access
 export const verifyAdmin = async (req, res, next) => {
   try {
-    const token = req.cookies.access_token || req.cookies.token;
+    // Check cookies first, then Authorization header
+    let token = req.cookies.access_token || req.cookies.token;
+    
+    // If no cookie token, check Authorization header
+    if (!token && req.headers.authorization) {
+      const authHeader = req.headers.authorization;
+      if (authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7);
+      }
+    }
     
     if (!token) {
       return next(errorHandler(401, 'Access denied. No token provided.'));
@@ -43,7 +52,16 @@ export const verifyAdmin = async (req, res, next) => {
 // Middleware to verify manager or admin access
 export const verifyManager = async (req, res, next) => {
   try {
-    const token = req.cookies.access_token || req.cookies.token;
+    // Check cookies first, then Authorization header
+    let token = req.cookies.access_token || req.cookies.token;
+    
+    // If no cookie token, check Authorization header
+    if (!token && req.headers.authorization) {
+      const authHeader = req.headers.authorization;
+      if (authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7);
+      }
+    }
     
     if (!token) {
       return next(errorHandler(401, 'Access denied. No token provided.'));
