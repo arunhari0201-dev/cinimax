@@ -325,6 +325,9 @@ const StripePayment = () => {
 
   const handlePaymentSuccess = async (paymentIntentId) => {
     try {
+      // Get token for Authorization header
+      const token = localStorage.getItem('access_token');
+      
       // Create the booking after successful payment
       const response = await axios.post(`${backendUrl}/api/bookings`, {
         movieId: bookingData.movieId,
@@ -339,7 +342,10 @@ const StripePayment = () => {
         phone: bookingData.phone || bookingData.parkingDetails?.phone || null,
         paymentIntentId: paymentIntentId, // Store Stripe payment intent ID
         paymentMethod: 'stripe'
-      }, { withCredentials: true });
+      }, { 
+        withCredentials: true,
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
 
       if (!response.data.booking) {
         throw new Error('Failed to create booking');
