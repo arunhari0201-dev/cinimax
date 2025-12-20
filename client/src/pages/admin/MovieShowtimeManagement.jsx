@@ -43,8 +43,12 @@ export default function MovieShowtimeManagement() {
   const fetchMovies = async () => {
     try {
       setLoading(true);
+      const token = localStorage.getItem('access_token');
       const res = await fetch(`${backendUrl}/api/movies`, {
-        credentials: 'include'
+        credentials: 'include',
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : ''
+        }
       });
       const data = await res.json();
       
@@ -64,8 +68,12 @@ export default function MovieShowtimeManagement() {
   const fetchShowtimesByMovie = async (movieId) => {
     try {
       setLoading(true);
+      const token = localStorage.getItem('access_token');
       const res = await fetch(`${backendUrl}/api/showtimes/by-movie/${movieId}`, {
-        credentials: 'include'
+        credentials: 'include',
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : ''
+        }
       });
       const data = await res.json();
       
@@ -198,20 +206,24 @@ export default function MovieShowtimeManagement() {
       
       if (isEditing) {
         // Update existing showtime
+        const token = localStorage.getItem('access_token');
         res = await fetch(`${backendUrl}/api/showtimes/${editingShowtime._id}`, {
           method: 'PUT',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': token ? `Bearer ${token}` : ''
           },
           credentials: 'include',
           body: JSON.stringify(showtimeData)
         });
       } else {
         // Create new showtime
+        const token = localStorage.getItem('access_token');
         res = await fetch(`${backendUrl}/api/showtimes`, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': token ? `Bearer ${token}` : ''
           },
           credentials: 'include',
           body: JSON.stringify(showtimeData)
@@ -244,9 +256,13 @@ export default function MovieShowtimeManagement() {
     
     try {
       setLoading(true);
+      const token = localStorage.getItem('access_token');
       const res = await fetch(`${backendUrl}/api/showtimes/${showtimeId}`, {
         method: 'DELETE',
-        credentials: 'include'
+        credentials: 'include',
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : ''
+        }
       });
       
       const data = await res.json();

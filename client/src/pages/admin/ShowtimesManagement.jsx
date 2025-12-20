@@ -27,10 +27,12 @@ export default function ShowtimesManagement() {
     
     try {
       setLoading(prev => ({ ...prev, archiving: true }));
+      const token = localStorage.getItem('access_token');
       const res = await fetch(`${backendUrl}/api/showtimes/force-archive`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
         },
         credentials: 'include'
       });
@@ -55,10 +57,12 @@ export default function ShowtimesManagement() {
     
     try {
       setLoading(prev => ({ ...prev, generating: true }));
+      const token = localStorage.getItem('access_token');
       const res = await fetch(`${backendUrl}/api/showtimes/generate-today`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
         },
         credentials: 'include'
       });
@@ -83,10 +87,12 @@ export default function ShowtimesManagement() {
     
     try {
       setLoading(prev => ({ ...prev, nextDay: true }));
+      const token = localStorage.getItem('access_token');
       const res = await fetch(`${backendUrl}/api/showtimes/generate-next-day`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
         },
         credentials: 'include'
       });
@@ -111,10 +117,12 @@ export default function ShowtimesManagement() {
     
     try {
       setLoading(prev => ({ ...prev, reopening: true }));
+      const token = localStorage.getItem('access_token');
       const res = await fetch(`${backendUrl}/api/showtimes/reopen-all`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
         },
         credentials: 'include'
       });
