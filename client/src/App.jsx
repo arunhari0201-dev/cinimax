@@ -62,9 +62,14 @@ export default function App() {
   useEffect(() => {
     const validateSession = async () => {
       if (currentUser && !skipSessionValidation) {
+        const backendUrl = 
+          process.env.NODE_ENV === 'production' 
+            ? 'https://cinimax.onrender.com' 
+            : 'http://localhost:5000';
+        
         try {
           console.log('🔍 Validating session for user:', currentUser.username);
-          const response = await fetch('/api/auth/validate-session', {
+          const response = await fetch(`${backendUrl}/api/auth/validate-session`, {
             method: 'GET',
             credentials: 'include',
             headers: {
