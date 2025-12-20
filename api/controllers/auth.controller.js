@@ -269,13 +269,23 @@ export const validateSession = async (req, res, next) => {
   try {
     console.log('🔍 Session validation request:', {
       cookies: req.cookies,
-      headers: req.headers.cookie
+      authHeader: req.headers.authorization ? 'present' : 'absent'
     });
     
-    const token = req.cookies.access_token || req.cookies.token;
+    // Check for token in cookies first, then in Authorization header
+    let token = req.cookies.access_token || req.cookies.token;
+    
+    // If no token in cookies, check Authorization header
+    if (!token && req.headers.authorization) {
+      const authHeader = req.headers.authorization;
+      if (authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7);
+        console.log('📍 Token found in Authorization header');
+      }
+    }
 
     if (!token) {
-      console.log('❌ No token found in cookies');
+      console.log('❌ No token found in cookies or Authorization header');
       return res.status(401).json({ valid: false, message: 'No session found' });
     }
 
