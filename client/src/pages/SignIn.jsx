@@ -56,6 +56,7 @@ export default function SignIn() {
         console.log('🔑 Token stored in localStorage');
       }
       
+      // Clear any previous errors and set user data
       dispatch(signInSuccess(data));
       
       // Check user role and redirect accordingly
@@ -67,7 +68,7 @@ export default function SignIn() {
       }
     } catch (error) {
       console.error('❌ SignIn error:', error);
-      dispatch(signInFailure(error));
+      dispatch(signInFailure({ message: error.message || 'Something went wrong!' }));
     }
   };
 
