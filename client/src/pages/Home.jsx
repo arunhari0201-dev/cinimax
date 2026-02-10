@@ -272,8 +272,8 @@ const Home = () => {
           </div>
         </div>
       ),
-      background: '#0D0D0D',
-      color: '#F5F5F5',
+      background: '#FFFFFF',
+      color: '#1F2933',
       icon: 'info',
       confirmButtonText: 'Close',
       showCloseButton: true,
@@ -283,7 +283,7 @@ const Home = () => {
         title: 'text-2xl font-bold',
         htmlContainer: 'p-6 text-lg leading-relaxed',
         icon: 'text-[#C8A951]',
-        confirmButton: 'bg-[#0D0D0D] border border-[#C8A951] text-[#F5F5F5] hover:shadow-lg transition-all duration-300',
+        confirmButton: 'bg-white border border-[#C8A951] text-[#1F2933] hover:shadow-lg transition-all duration-300',
       },
       didOpen: () => {
         const popup = document.querySelector('.swal2-popup');
@@ -416,279 +416,301 @@ const Home = () => {
         </div>
       </div>
 
-      <div className="movie-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8 md:gap-10 lg:gap-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="movie-grid grid grid-cols-1 gap-8 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {filteredMovies.map((movie) => (
           <div
             key={movie._id}
-            className="relative group bg-[#0D0D0D] border border-[#C8A951]/20 rounded-2xl overflow-hidden shadow-2xl transition-all duration-500 hover:border-[#C8A951]/80 hover:shadow-[0_20px_50px_rgba(0,0,0,0.8)] hover:scale-[1.03] backdrop-blur-sm max-w-md mx-auto"
-            style={{boxShadow: '0 12px 40px rgba(0, 0, 0, 0.7), 0 0 20px rgba(200, 169, 81, 0.15)'}}
+            className="group flex flex-col md:flex-row bg-white border border-[#E5E7EB] rounded-[22px] overflow-hidden transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_35px_90px_rgba(15,23,42,0.18)] w-full min-h-[260px]"
+            style={{ boxShadow: '0 25px 70px rgba(15, 23, 42, 0.12)' }}
           >
             <div
-              className="relative overflow-hidden cursor-pointer p-4"
               onClick={() => showMovieDetails(movie)}
+              className="relative w-full md:w-[38%] min-h-[220px] md:min-h-[260px] cursor-pointer overflow-hidden"
             >
-              <div className="aspect-square w-full max-w-sm mx-auto bg-[#1A1A1A] rounded-xl overflow-hidden border border-[#C8A951]/10 shadow-inner">
-                <img
-                  src={
-                    movie.imageUrl && movie.imageUrl.startsWith('http') 
-                      ? movie.imageUrl // Use Cloudinary URL directly
-                      : imageMap[movie.imageUrl] || '/src/images/new.jpg'
-                  }
-                  alt={movie.name || 'Movie Poster'}
-                  className="w-full h-full object-cover object-center transition-all duration-700 group-hover:scale-110"
-                  onError={(e) => {
-                    // Fallback if Cloudinary image fails to load
-                    e.target.src = '/src/images/new.jpg';
-                  }}
-                  loading="lazy"
-                />
-              </div>
-              <div className="absolute bottom-2 left-2 right-2 bg-[#0D0D0D]/95 flex gap-3 items-center p-3 border border-[#C8A951]/30 rounded-lg backdrop-blur-md">
-                <div className="flex items-center text-[#C8A951] font-cinzel text-sm">
-                  <FontAwesomeIcon icon={faStar} className="mr-2" style={{filter: 'drop-shadow(0 0 3px rgba(200, 169, 81, 0.6))'}} />
+              <img
+                src={
+                  movie.imageUrl && movie.imageUrl.startsWith('http')
+                    ? movie.imageUrl
+                    : imageMap[movie.imageUrl] || '/src/images/new.jpg'
+                }
+                alt={movie.name || 'Movie Poster'}
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                onError={(e) => {
+                  e.target.src = '/src/images/new.jpg';
+                }}
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+              <div className="absolute top-4 left-4 flex flex-col gap-2">
+                <span className="bg-white text-[#C8A951] text-xs font-semibold px-3 py-1 rounded-md shadow-sm flex items-center gap-1.5">
+                  <FontAwesomeIcon icon={faStar} className="text-sm" />
                   {movie.ratings}
-                </div>
-                <div className="flex items-center text-[#E50914] font-cinzel text-sm">
-                  <FontAwesomeIcon icon={faThumbsUp} className="mr-2" style={{filter: 'drop-shadow(0 0 3px rgba(229, 9, 20, 0.6))'}} />
-                  {movie.votes} Votes
-                </div>
+                </span>
+                <span className="bg-white text-[#E50914] text-[11px] font-semibold px-3 py-1 rounded-md shadow-sm flex items-center gap-2">
+                  <FontAwesomeIcon icon={faThumbsUp} /> {movie.votes} votes
+                </span>
               </div>
-            </div>
-
-            <div className="p-6 bg-gradient-to-t from-[#0D0D0D] via-[#1A1A1A] to-[#0D0D0D] text-[#F5F5F5] space-y-4 font-poppins">
-              {/* Movie Title */}
-              <div className="flex items-center gap-3 mb-5">
-                <FontAwesomeIcon icon={faFilm} className="text-[#C8A951] text-xl flex-shrink-0" style={{filter: 'drop-shadow(0 0 4px rgba(200, 169, 81, 0.5))'}} />
-                <h3 className="text-xl sm:text-2xl font-bold text-[#C8A951] font-cinzel leading-tight" style={{textShadow: '0 0 8px rgba(200, 169, 81, 0.3)'}}>
+              <div className="absolute bottom-4 left-4">
+                <p className="text-white/70 text-[0.6rem] uppercase tracking-[0.4em]">Now Showing</p>
+                <h3 className="text-white text-xl font-semibold mt-1 drop-shadow-sm">
                   {movie.title || movie.name}
                 </h3>
               </div>
-              
-              {/* Movie Details Grid */}
-              <div className="space-y-4">
-              
-              {/* Show screen and timing from showtimes if available */}
-              {(() => {
-                // Check if movie has valid showtimes
-                if (!hasValidShowtimes(movie)) {
-                  return (
-                    <>
-                    {/* Screen Info */}
-                    <div className="flex items-center gap-4 p-3">
-                      <FontAwesomeIcon icon={faTv} className="text-[#C8A951] text-xl flex-shrink-0" />
-                      <div className="flex-1">
-                        <span className="text-sm text-[#C8A951] font-semibold block mb-1">Screen</span>
-                        <span className="text-yellow-400 font-bold text-base">TBA (Coming Soon)</span>
-                      </div>
-                    </div>
-                    
-                    {/* Show Time Info */}
-                    <div className="flex items-center gap-4 p-3">
-                      <FontAwesomeIcon icon={faClock} className="text-[#C8A951] text-xl flex-shrink-0" />
-                      <div className="flex-1">
-                        <span className="text-sm text-[#C8A951] font-semibold block mb-1">Show Time</span>
-                        <span className="text-yellow-400 font-bold text-base">TBA (Coming Soon)</span>
-                      </div>
-                    </div>
-                    
-                    {/* Language Info */}
-                    <div className="flex items-center gap-4 p-3">
-                      <FontAwesomeIcon icon={faLanguage} className="text-[#C8A951] text-xl flex-shrink-0" />
-                      <div className="flex-1">
-                        <span className="text-sm text-[#C8A951] font-semibold block mb-1">Language</span>
-                        <span className="text-[#F5F5F5] font-bold text-base">{Array.isArray(movie.language) ? movie.language.join(', ') : movie.language}</span>
-                      </div>
-                    </div>
-                    </>
-                  );
-                }
-                
-                // Get the first valid (non-archived and bookable) showtime
-                const validShowtimes = movie.showtimes?.filter(showtime => 
-                  !showtime.isArchived && isShowtimeBookable(showtime)
-                );
-                const firstValidShowtime = validShowtimes?.[0];
-                
-                return firstValidShowtime && typeof firstValidShowtime === 'object' ? (
-                <>
-                {/* Screen Info */}
-                <div className="flex items-center gap-4 p-3">
-                  <FontAwesomeIcon icon={faTv} className="text-[#C8A951] text-xl flex-shrink-0" />
-                  <div className="flex-1">
-                    <span className="text-sm text-[#C8A951] font-semibold block mb-1">Screen</span>
-                    <span className="text-[#F5F5F5] font-bold text-base">{firstValidShowtime.screen}</span>
+            </div>
+
+            <div className="flex-1 flex flex-col bg-white">
+              <div className="flex-1 px-6 pt-6 pb-4 flex flex-col gap-5">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                  <div>
+                    <p className="text-[10px] uppercase tracking-[0.4em] text-[#98A2B3]">Featured</p>
+                    <h3 className="text-2xl font-semibold text-[var(--text-primary)] mt-1">
+                      {movie.title || movie.name}
+                    </h3>
+                    <p className="text-sm text-[#98A2B3] mt-1">
+                      {(movie.genre && typeof movie.genre === 'string') ? movie.genre.split(',')[0] : 'Feature Film'}
+                    </p>
+                  </div>
+                  <div className="text-left sm:text-right">
+                    <p className="text-[11px] uppercase tracking-[0.3em] text-[#98A2B3]">Certification</p>
+                    <p className="text-xl font-semibold text-[var(--text-primary)]">{movie.certificate || 'U/A 13+'}</p>
                   </div>
                 </div>
-                
-                {/* Show Time Info */}
-                <div className="flex items-center gap-4 p-3">
-                  <FontAwesomeIcon icon={faClock} className="text-[#C8A951] text-xl flex-shrink-0" />
-                  <div className="flex-1">
-                    <span className="text-sm text-[#C8A951] font-semibold block mb-1">Show Time</span>
-                    <span className="text-[#F5F5F5] font-bold text-sm leading-relaxed">
-                      {new Date(firstValidShowtime.startTime).toLocaleTimeString('en-US', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: true
-                      })} - {new Date(firstValidShowtime.endTime).toLocaleTimeString('en-US', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: true
-                      })}
-                    </span>
-                  </div>
+
+                <div className="flex flex-wrap items-center gap-3 text-[11px] uppercase tracking-[0.32em] text-[#98A2B3]">
+                  <span>{Array.isArray(movie.language) ? movie.language[0] : movie.language || 'Multiple'}</span>
+                  <span className="w-1 h-1 rounded-full bg-[#D0D5DD]"></span>
+                  <span>{movie.duration || '140 min'}</span>
+                  <span className="w-1 h-1 rounded-full bg-[#D0D5DD]"></span>
+                  <span>{movie.format || 'IMAX'}</span>
                 </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 
-                {/* Language Info */}
-                <div className="flex items-center gap-4 p-3">
-                  <FontAwesomeIcon icon={faLanguage} className="text-[#C8A951] text-xl flex-shrink-0" />
-                  <div className="flex-1">
-                    <span className="text-sm text-[#C8A951] font-semibold block mb-1">Language</span>
-                    <span className="text-[#F5F5F5] font-bold text-base">{movie.language}</span>
-                  </div>
-                </div>
+                {/* Show screen and timing from showtimes if available */}
+                {(() => {
+                  // Check if movie has valid showtimes
+                  if (!hasValidShowtimes(movie)) {
+                    return (
+                      <>
+                      {/* Screen Info */}
+                      <div className="flex items-center gap-4 p-3.5 rounded-xl border border-[#E7E9F0] bg-[#FCFCFD] shadow-[0_10px_26px_rgba(15,23,42,0.05)]">
+                        <FontAwesomeIcon icon={faTv} className="text-[#C8A951] text-xl flex-shrink-0" />
+                        <div className="flex-1">
+                          <span className="text-sm text-[#475467] font-semibold block mb-1">Screen</span>
+                          <span className="text-[#C8A951] font-semibold text-base">TBA (Coming Soon)</span>
+                        </div>
+                      </div>
+                      
+                      {/* Show Time Info */}
+                      <div className="flex items-center gap-4 p-3.5 rounded-xl border border-[#E7E9F0] bg-[#FCFCFD] shadow-[0_10px_26px_rgba(15,23,42,0.05)]">
+                        <FontAwesomeIcon icon={faClock} className="text-[#C8A951] text-xl flex-shrink-0" />
+                        <div className="flex-1">
+                          <span className="text-sm text-[#475467] font-semibold block mb-1">Show Time</span>
+                          <span className="text-[#C8A951] font-semibold text-base">TBA (Coming Soon)</span>
+                        </div>
+                      </div>
+                      
+                      {/* Language Info */}
+                      <div className="flex items-center gap-4 p-3.5 rounded-xl border border-[#E7E9F0] bg-[#FCFCFD] shadow-[0_10px_26px_rgba(15,23,42,0.05)]">
+                        <FontAwesomeIcon icon={faLanguage} className="text-[#C8A951] text-xl flex-shrink-0" />
+                        <div className="flex-1">
+                          <span className="text-sm text-[#475467] font-semibold block mb-1">Language</span>
+                          <span className="text-[var(--text-primary)] font-semibold text-base">{Array.isArray(movie.language) ? movie.language.join(', ') : movie.language}</span>
+                        </div>
+                      </div>
+                      </>
+                    );
+                  }
                   
-                  {/* Time Slot Category */}
-                  <div className="flex items-center gap-4 p-3">
-                    <FontAwesomeIcon icon={faTheaterMasks} className="text-[#C8A951] text-xl flex-shrink-0" />
+                  // Get the first valid (non-archived and bookable) showtime
+                  const validShowtimes = movie.showtimes?.filter(showtime => 
+                    !showtime.isArchived && isShowtimeBookable(showtime)
+                  );
+                  const firstValidShowtime = validShowtimes?.[0];
+                  
+                  return firstValidShowtime && typeof firstValidShowtime === 'object' ? (
+                  <>
+                  {/* Screen Info */}
+                  <div className="flex items-center gap-4 p-3.5 rounded-xl border border-[#E7E9F0] bg-[#FCFCFD] shadow-[0_10px_26px_rgba(15,23,42,0.05)]">
+                    <FontAwesomeIcon icon={faTv} className="text-[#C8A951] text-xl flex-shrink-0" />
                     <div className="flex-1">
-                      <span className="text-sm text-[#C8A951] font-semibold block mb-2">Time Slot</span>
-                      <span className={`inline-flex items-center gap-3 px-4 py-2 rounded-full font-bold text-sm ${
-                        firstValidShowtime.screen === 'Screen 1' 
-                          ? 'bg-yellow-600/25 text-yellow-200 border border-yellow-400/40' // Morning
-                          : firstValidShowtime.screen === 'Screen 2'
-                          ? 'bg-orange-600/25 text-orange-200 border border-orange-400/40' // Afternoon
-                          : 'bg-purple-600/25 text-purple-200 border border-purple-400/40' // Night
-                      }`}>
-                        {firstValidShowtime.screen === 'Screen 1' 
-                          ? 'Morning Show' 
-                          : firstValidShowtime.screen === 'Screen 2'
-                          ? 'Afternoon Show'
-                          : 'Night Show'
-                        }
+                      <span className="text-sm text-[#475467] font-semibold block mb-1">Screen</span>
+                      <span className="text-[var(--text-primary)] font-semibold text-base">{firstValidShowtime.screen}</span>
+                    </div>
+                  </div>
+                  
+                  {/* Show Time Info */}
+                  <div className="flex items-center gap-4 p-3.5 rounded-xl border border-[#E7E9F0] bg-[#FCFCFD] shadow-[0_10px_26px_rgba(15,23,42,0.05)]">
+                    <FontAwesomeIcon icon={faClock} className="text-[#C8A951] text-xl flex-shrink-0" />
+                    <div className="flex-1">
+                      <span className="text-sm text-[#475467] font-semibold block mb-1">Show Time</span>
+                      <span className="text-[var(--text-primary)] font-semibold text-sm leading-relaxed">
+                        {new Date(firstValidShowtime.startTime).toLocaleTimeString('en-US', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: true
+                        })} - {new Date(firstValidShowtime.endTime).toLocaleTimeString('en-US', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: true
+                        })}
                       </span>
                     </div>
                   </div>
-                </>
-              ) : (
-                <>
-                {/* Fallback to movie properties if showtimes not available */}
-                {/* Screen Info */}
-                <div className="flex items-center gap-4 p-3">
-                  <FontAwesomeIcon icon={faTv} className="text-[#C8A951] text-xl flex-shrink-0" />
-                  <div className="flex-1">
-                    <span className="text-sm text-[#C8A951] font-semibold block mb-1">Screen</span>
-                    <span className="text-[#F5F5F5] font-bold text-base">{movie.screen || 'TBA'}</span>
-                  </div>
-                </div>
-                
-                {/* Timing Info */}
-                <div className="flex items-center gap-4 p-3">
-                  <FontAwesomeIcon icon={faClock} className="text-[#C8A951] text-xl flex-shrink-0" />
-                  <div className="flex-1">
-                    <span className="text-sm text-[#C8A951] font-semibold block mb-1">Timing</span>
-                    <span className="text-[#F5F5F5] font-bold text-base">{movie.timing || 'TBA'}</span>
-                  </div>
-                </div>
-                
-                {/* Language Info */}
-                <div className="flex items-center gap-4 p-3">
-                  <FontAwesomeIcon icon={faLanguage} className="text-[#C8A951] text-xl flex-shrink-0" />
-                  <div className="flex-1">
-                    <span className="text-sm text-[#C8A951] font-semibold block mb-1">Language</span>
-                    <span className="text-[#F5F5F5] font-bold text-base">{Array.isArray(movie.language) ? movie.language.join(', ') : movie.language}</span>
-                  </div>
-                </div>
-                </>
-              );
-              })()}
-            </div>
-            </div>
-
-            <div className="px-6 pb-6 bg-gradient-to-t from-[#0D0D0D] to-[#1A1A1A] text-center flex flex-col gap-4">
-              {/* Primary: Real-time booking button with cutoff validation */}
-              {(() => {
-                // Check if movie has valid showtimes
-                if (!hasValidShowtimes(movie)) {
-                  return (
-                    <div className="space-y-2">
-                      <button
-                        className="bg-gray-600 border-2 border-gray-500 text-gray-300 font-playfair font-semibold py-3 px-6 cursor-not-allowed w-full flex items-center justify-center"
-                        disabled
-                      >
-                        <span className="mr-2">No Available Showtimes</span>
-                        <div className="w-2 h-2 rounded-full bg-red-500"></div>
-                      </button>
-                      <p className="text-yellow-400 text-sm font-poppins">
-                        Movie added - Showtimes will be available soon!
-                      </p>
-                    </div>
-                  );
-                }
-                
-                // Get the first valid (non-archived and bookable) showtime
-                const validShowtimes = movie.showtimes?.filter(showtime => 
-                  !showtime.isArchived && isShowtimeBookable(showtime)
-                );
-                const firstValidShowtime = validShowtimes?.[0];
-                
-                const showtimeId = firstValidShowtime._id;
-                const isBookable = isShowtimeBookable(firstValidShowtime);
-                const timeRemaining = getTimeUntilCutoff(firstValidShowtime);
                   
-                  if (!isBookable) {
+                  {/* Language Info */}
+                  <div className="flex items-center gap-4 p-3.5 rounded-xl border border-[#E7E9F0] bg-[#FCFCFD] shadow-[0_10px_26px_rgba(15,23,42,0.05)]">
+                    <FontAwesomeIcon icon={faLanguage} className="text-[#C8A951] text-xl flex-shrink-0" />
+                    <div className="flex-1">
+                      <span className="text-sm text-[#475467] font-semibold block mb-1">Language</span>
+                      <span className="text-[var(--text-primary)] font-semibold text-base">{movie.language}</span>
+                    </div>
+                  </div>
+                    
+                    {/* Time Slot Category */}
+                    <div className="flex items-center gap-4 p-3.5 rounded-xl border border-[#E7E9F0] bg-[#FCFCFD] shadow-[0_10px_26px_rgba(15,23,42,0.05)]">
+                      <FontAwesomeIcon icon={faTheaterMasks} className="text-[#C8A951] text-xl flex-shrink-0" />
+                      <div className="flex-1">
+                        <span className="text-sm text-[#475467] font-semibold block mb-2">Time Slot</span>
+                        <span className={`inline-flex items-center gap-3 px-4 py-2 rounded-lg font-bold text-sm ${
+                          firstValidShowtime.screen === 'Screen 1' 
+                            ? 'bg-[#FFF6EA] text-[#8E6A17] border border-[#F5D7A1]' // Morning
+                            : firstValidShowtime.screen === 'Screen 2'
+                            ? 'bg-[#FFEFE3] text-[#C35000] border border-[#F8C9A8]' // Afternoon
+                            : 'bg-[#F4EAFF] text-[#6C2FB9] border border-[#DCC7FF]' // Night
+                        }`}>
+                          {firstValidShowtime.screen === 'Screen 1' 
+                            ? 'Morning Show' 
+                            : firstValidShowtime.screen === 'Screen 2'
+                            ? 'Afternoon Show'
+                            : 'Night Show'
+                          }
+                        </span>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                  {/* Fallback to movie properties if showtimes not available */}
+                  {/* Screen Info */}
+                  <div className="flex items-center gap-4 p-3.5 rounded-xl border border-[#E7E9F0] bg-[#FCFCFD] shadow-[0_10px_26px_rgba(15,23,42,0.05)]">
+                    <FontAwesomeIcon icon={faTv} className="text-[#C8A951] text-xl flex-shrink-0" />
+                    <div className="flex-1">
+                      <span className="text-sm text-[#475467] font-semibold block mb-1">Screen</span>
+                      <span className="text-[var(--text-primary)] font-semibold text-base">{movie.screen || 'TBA'}</span>
+                    </div>
+                  </div>
+                  
+                  {/* Timing Info */}
+                  <div className="flex items-center gap-4 p-3.5 rounded-xl border border-[#E7E9F0] bg-[#FCFCFD] shadow-[0_10px_26px_rgba(15,23,42,0.05)]">
+                    <FontAwesomeIcon icon={faClock} className="text-[#C8A951] text-xl flex-shrink-0" />
+                    <div className="flex-1">
+                      <span className="text-sm text-[#475467] font-semibold block mb-1">Timing</span>
+                      <span className="text-[var(--text-primary)] font-semibold text-base">{movie.timing || 'TBA'}</span>
+                    </div>
+                  </div>
+                  
+                  {/* Language Info */}
+                  <div className="flex items-center gap-4 p-3.5 rounded-xl border border-[#E7E9F0] bg-[#FCFCFD] shadow-[0_10px_26px_rgba(15,23,42,0.05)]">
+                    <FontAwesomeIcon icon={faLanguage} className="text-[#C8A951] text-xl flex-shrink-0" />
+                    <div className="flex-1">
+                      <span className="text-sm text-[#475467] font-semibold block mb-1">Language</span>
+                      <span className="text-[var(--text-primary)] font-semibold text-base">{Array.isArray(movie.language) ? movie.language.join(', ') : movie.language}</span>
+                    </div>
+                  </div>
+                  </>
+                );
+                })()}
+                </div>
+              </div>
+
+              <div className="px-6 pb-5 pt-4 border-t border-[#E7E9F0] bg-[#FBFBFC]">
+                {/* Primary: Real-time booking button with cutoff validation */}
+                {(() => {
+                  // Check if movie has valid showtimes
+                  if (!hasValidShowtimes(movie)) {
                     return (
                       <div className="space-y-2">
                         <button
-                          className="bg-gray-600 border-2 border-gray-500 text-gray-300 font-playfair font-semibold py-3 px-6 cursor-not-allowed w-full flex items-center justify-center"
+                          className="bg-[#F2F4F7] border-2 border-[#E4E7EC] text-[#98A2B3] font-poppins font-semibold py-3 px-6 cursor-not-allowed w-full flex items-center justify-center rounded-lg"
                           disabled
                         >
-                          <span className="mr-2">Booking Closed</span>
+                          <span className="mr-2">Book Tickets</span>
                           <div className="w-2 h-2 rounded-full bg-red-500"></div>
                         </button>
-                        <p className="text-red-400 text-sm font-poppins">
-                          {firstValidShowtime ? (
-                            firstValidShowtime.isArchived ? 'Show has been archived' :
-                            new Date() > new Date(firstValidShowtime.endTime) ? 'Show has ended' :
-                            new Date() > new Date(firstValidShowtime.startTime) ? 'Show has started' :
-                            'Booking cutoff time passed'
-                          ) : 'Not available for booking'}
+                        <p className="text-[#8E6A17] text-sm font-poppins">
+                          Movie added - Showtimes will be available soon!
                         </p>
+                        <Link to={`/movie/${movie._id}`} className="block">
+                          <button
+                            className="w-full bg-white border border-dashed border-[#D0D5DD] text-[#475467] font-poppins font-medium py-3 px-4 transition-all duration-300 hover:border-[#EE1D25] hover:text-[#EE1D25] rounded-lg"
+                          >
+                            View Showtimes
+                          </button>
+                        </Link>
                       </div>
                     );
                   }
                   
-                  return (
-                    <div className="space-y-3">
-                      {/* Primary Button - View All Showtimes */}
-                      <Link to={`/movie/${movie._id}`}>
-                        <button
-                          className="bg-[#0D0D0D] border-2 border-[#C8A951] text-[#F5F5F5] font-playfair font-semibold py-3 px-6 transition-all duration-300 hover:shadow-lg w-full flex items-center justify-center"
-                          style={{boxShadow: '0 0 15px rgba(200, 169, 81, 0.3)'}}
-                        >
-                          <span className="mr-2">View Showtimes</span>
-                          <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
-                        </button>
-                      </Link>
-                      
-                      {/* Secondary Button - Quick Book First Available */}
-                      <Link to={`/tickets/${movie._id}/${showtimeId}`}>
-                        <button
-                          className="bg-transparent border border-[#C8A951]/50 text-[#C8A951] font-playfair font-medium py-2 px-4 transition-all duration-300 hover:bg-[#C8A951]/10 hover:border-[#C8A951] w-full flex items-center justify-center text-sm"
-                        >
-                          <span className="mr-2">Quick Book ({firstValidShowtime.screen} - {new Date(firstValidShowtime.startTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })})</span>
-                          <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
-                        </button>
-                      </Link>
-                      
-                      {timeRemaining && (
-                        <p className="text-yellow-400 text-xs font-poppins text-center">
-                          ⏰ Booking closes in {timeRemaining}
-                        </p>
-                      )}
-                    </div>
+                  // Get the first valid (non-archived and bookable) showtime
+                  const validShowtimes = movie.showtimes?.filter(showtime => 
+                    !showtime.isArchived && isShowtimeBookable(showtime)
                   );
-              })()}
+                  const firstValidShowtime = validShowtimes?.[0];
+                  
+                  const showtimeId = firstValidShowtime._id;
+                  const isBookable = isShowtimeBookable(firstValidShowtime);
+                  const timeRemaining = getTimeUntilCutoff(firstValidShowtime);
+                    
+                    if (!isBookable) {
+                      return (
+                        <div className="space-y-2">
+                          <button
+                            className="bg-[#F2F4F7] border-2 border-[#E4E7EC] text-[#98A2B3] font-poppins font-semibold py-3 px-6 cursor-not-allowed w-full flex items-center justify-center rounded-lg"
+                            disabled
+                          >
+                            <span className="mr-2">Book Tickets</span>
+                            <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                          </button>
+                          <p className="text-[#D64545] text-sm font-poppins">
+                            {firstValidShowtime ? (
+                              firstValidShowtime.isArchived ? 'Show has been archived' :
+                              new Date() > new Date(firstValidShowtime.endTime) ? 'Show has ended' :
+                              new Date() > new Date(firstValidShowtime.startTime) ? 'Show has started' :
+                              'Booking cutoff time passed'
+                            ) : 'Not available for booking'}
+                          </p>
+                        </div>
+                      );
+                    }
+                    
+                    return (
+                      <>
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <Link to={`/tickets/${movie._id}/${showtimeId}`} className="w-full sm:w-auto flex-1">
+                            <button
+                              className="w-full bg-[#EE1D25] border-2 border-[#EE1D25] text-white font-poppins font-semibold py-3 px-6 transition-all duration-300 hover:bg-[#d91219] hover:shadow-[0_15px_35px_rgba(238,29,37,0.35)] rounded-lg"
+                            >
+                              Book Tickets
+                            </button>
+                          </Link>
+                          <Link to={`/movie/${movie._id}`} className="w-full sm:w-auto flex-1">
+                            <button
+                              className="w-full bg-white border border-dashed border-[#D0D5DD] text-[#475467] font-poppins font-medium py-3 px-4 transition-all duration-300 hover:border-[#EE1D25] hover:text-[#EE1D25] rounded-lg"
+                            >
+                              View Showtimes
+                            </button>
+                          </Link>
+                        </div>
+                        {timeRemaining && (
+                          <p className="text-[#8E6A17] text-xs font-poppins text-center mt-3">
+                            Booking closes in {timeRemaining}
+                          </p>
+                        )}
+                      </>
+                    );
+                })()}
+              </div>
             </div>
           </div>
         ))}

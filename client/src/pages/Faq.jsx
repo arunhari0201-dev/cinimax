@@ -75,8 +75,8 @@ const FAQ = () => {
             <p>💡 If it's a common question, we may add it to our FAQ section to help others!</p>
           </div>
         `,
-        background: '#0D0D0D',
-        color: '#F5F5F5',
+        background: '#FFFFFF',
+        color: '#1F2933',
         confirmButtonColor: '#C8A951',
         confirmButtonText: 'Got it!',
         timer: 5000,
@@ -122,8 +122,8 @@ const FAQ = () => {
             <p>⏰ We typically respond within 24 hours!</p>
           </div>
         `,
-        background: '#0D0D0D',
-        color: '#F5F5F5',
+        background: '#FFFFFF',
+        color: '#1F2933',
         confirmButtonColor: '#C8A951',
         confirmButtonText: 'Great!',
         timer: 5000,

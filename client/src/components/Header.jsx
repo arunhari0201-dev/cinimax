@@ -29,17 +29,17 @@ export default function Header() {
   };
 
   return (
-    <div className="bg-[#0D0D0D] text-[#F5F5F5] shadow-lg sticky top-0 z-50 font-[Playfair Display], serif">
+    <div className="bg-white text-[#1F2933] shadow-lg shadow-[#1018280d] sticky top-0 z-50 font-[Playfair Display], serif border-b border-[#EAECF0]">
       {/* Container */}
       <div className="max-w-full px-4 md:px-6 lg:px-10 flex justify-between items-center py-4">
         {/* Brand Logo */}
         <Link to="/" className="group">
-          <h1 className="text-3xl md:text-4xl font-bold font-cinzel text-transparent bg-clip-text bg-gradient-to-r from-[#C8A951] via-[#DFBD69] to-[#9E7E38] tracking-wide hover:scale-105 hover:cursor-pointer transition-transform duration-300" 
+          <h1 className="text-2xl md:text-3xl font-bold font-cinzel text-transparent bg-clip-text bg-gradient-to-r from-[#C8A951] via-[#DFBD69] to-[#9E7E38] tracking-[0.25em] hover:scale-105 hover:cursor-pointer transition-transform duration-300" 
               style={{
-                textShadow: '0 0 12px rgba(200, 169, 81, 0.4), 0 0 4px rgba(255, 255, 255, 0.1)',
-                letterSpacing: '0.05em'
+                textShadow: '0 0 10px rgba(200, 169, 81, 0.4), 0 0 3px rgba(255, 255, 255, 0.1)',
+                letterSpacing: '0.08em'
               }}>
-             Cinematic Popcorn Park
+             CiniMax
           </h1>
         </Link>
 
@@ -52,7 +52,7 @@ export default function Header() {
         </button>
 
         {/* Desktop Navigation */}
-        <ul className="hidden md:flex flex-grow justify-evenly items-center text-[#F5F5F5]">
+        <ul className="hidden md:flex flex-grow justify-evenly items-center text-[#1F2933]">
           {[
             { name: "Home", icon: <FaHome />, path: "/" },
             { name: "About", icon: <FaInfoCircle />, path: "/about" },
@@ -111,12 +111,12 @@ export default function Header() {
         <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+            className="fixed inset-0 bg-black bg-opacity-40 z-40 md:hidden"
             onClick={() => setSidebarOpen(false)}
           />
 
           {/* Sidebar */}
-          <div className="fixed top-0 left-0 w-72 h-full bg-gradient-to-b from-[#0D0D0D] to-[#1A1A1A] z-50 transform transition-transform duration-300 md:hidden shadow-2xl">
+          <div className="fixed top-0 left-0 w-72 h-full bg-gradient-to-b from-white to-[#f5f6fb] z-50 transform transition-transform duration-300 md:hidden shadow-2xl">
             <div className="p-6">
               {/* Close Button */}
               <button
@@ -127,8 +127,8 @@ export default function Header() {
               </button>
 
               {/* Brand */}
-              <h2 className="text-2xl font-bold text-[#C8A951] mb-8 font-cinzel">
-                Cinematic Popcorn Park
+              <h2 className="text-2xl font-bold text-[#C8A951] mb-8 font-cinzel tracking-[0.2em]">
+                CiniMax
               </h2>
 
               {/* Navigation Links */}
@@ -142,7 +142,7 @@ export default function Header() {
                   <li
                     key={name}
                     onClick={() => handleNavigation(path)}
-                    className="flex items-center gap-3 text-[#F5F5F5] font-medium px-3 py-2 hover:bg-[#0D0D0D] hover:text-[#C8A951] border-l-2 border-transparent hover:border-[#C8A951] transition-all duration-300 cursor-pointer"
+                    className="flex items-center gap-3 text-[#1F2933] font-medium px-3 py-2 hover:bg-[#F5F6FB] hover:text-[#C8A951] border-l-2 border-transparent hover:border-[#C8A951] transition-all duration-300 cursor-pointer rounded-lg"
                   >
                     <span className="text-xl text-[#C8A951]">{icon}</span>
                     {name}
@@ -153,7 +153,7 @@ export default function Header() {
                 {currentUser && (currentUser.role === 'admin' || currentUser.role === 'manager' || currentUser.role === 'staff') && (
                   <li
                     onClick={() => handleNavigation("/admin/dashboard")}
-                    className="flex items-center gap-3 text-[#F5F5F5] font-medium px-3 py-2 hover:bg-[#0D0D0D] hover:text-[#C8A951] border-l-2 border-transparent hover:border-[#C8A951] transition-all duration-300"
+                    className="flex items-center gap-3 text-[#1F2933] font-medium px-3 py-2 hover:bg-[#F5F6FB] hover:text-[#C8A951] border-l-2 border-transparent hover:border-[#C8A951] transition-all duration-300 rounded-lg"
                   >
                     <span className="text-xl text-[#C8A951]"><FaUserShield /></span>
                     Admin Panel
@@ -167,7 +167,7 @@ export default function Header() {
                       ? handleNavigation("/profile")
                       : handleNavigation("/sign-in")
                   }
-                  className="flex items-center gap-3 text-[#F5F5F5] font-medium px-3 py-2 hover:bg-[#0D0D0D] hover:text-[#C8A951] border-l-2 border-transparent hover:border-[#C8A951] transition-all duration-300 cursor-pointer mt-4"
+                  className="flex items-center gap-3 text-[#1F2933] font-medium px-3 py-2 hover:bg-[#F5F6FB] hover:text-[#C8A951] border-l-2 border-transparent hover:border-[#C8A951] transition-all duration-300 cursor-pointer mt-4 rounded-lg"
                 >
                   {currentUser ? (
                     <>
@@ -197,17 +197,17 @@ export default function Header() {
 
       {/* Loading Screen */}
       {loading && (
-        <div className="fixed inset-0 flex flex-col items-center justify-center bg-[#0D0D0D] z-50">
+        <div className="fixed inset-0 flex flex-col items-center justify-center bg-white/95 z-50">
           <div className="flex items-center space-x-4 mb-4 animate-bounce">
             <FaTicketAlt className="text-4xl md:text-6xl text-[#C8A951]" style={{filter: 'drop-shadow(0 0 8px rgba(200, 169, 81, 0.5))'}} />
-            <h1 className="text-2xl md:text-3xl font-[Cinzel], serif text-[#F5F5F5]" style={{textShadow: '0 0 10px rgba(200, 169, 81, 0.3)'}}>
-              Cinematic Popcorn Park
+            <h1 className="text-2xl md:text-3xl font-[Cinzel], serif text-[#1F2933] tracking-[0.3em]" style={{textShadow: '0 0 10px rgba(200, 169, 81, 0.15)'}}>
+              CiniMax
             </h1>
           </div>
-          <div className="text-center text-lg font-medium text-[#F5F5F5] mt-8 font-[Poppins], sans-serif">
+          <div className="text-center text-lg font-medium text-[#1F2933] mt-8 font-[Poppins], sans-serif">
             Preparing your premium experience...
           </div>
-          <div className="w-32 h-1 mt-6 bg-[#0D0D0D] overflow-hidden border border-[#C8A951]">
+          <div className="w-32 h-1 mt-6 bg-white overflow-hidden border border-[#C8A951]">
             <div className="h-full bg-gradient-to-r from-[#C8A951] to-[#E50914] animate-loading" style={{boxShadow: '0 0 8px rgba(200, 169, 81, 0.5)'}} />
           </div>
         </div>

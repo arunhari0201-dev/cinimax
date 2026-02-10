@@ -47,6 +47,13 @@ export default function Reports() {
       : 'http://localhost:5000';
 
   const COLORS = ['#C8A951', '#E50914', '#00C853', '#FF9800', '#9C27B0', '#2196F3'];
+  const tooltipStyles = {
+    backgroundColor: '#ffffff',
+    border: '1px solid rgba(198, 157, 60, 0.25)',
+    borderRadius: '12px',
+    color: '#1f2933',
+    boxShadow: '0 18px 35px rgba(15, 23, 42, 0.08)'
+  };
 
   useEffect(() => {
     if (!currentUser || !['admin', 'manager', 'staff'].includes(currentUser.role)) {
@@ -105,10 +112,10 @@ export default function Reports() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0D0D0D] flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--bg-page)] flex items-center justify-center">
         <div className="flex flex-col items-center">
           <FaSpinner className="text-6xl text-[#C8A951] animate-spin mb-4" />
-          <p className="text-[#F5F5F5] text-lg">Loading reports...</p>
+          <p className="text-[var(--text-primary)] text-lg">Loading reports...</p>
         </div>
       </div>
     );
@@ -116,7 +123,7 @@ export default function Reports() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#0D0D0D] flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--bg-page)] flex items-center justify-center">
         <div className="text-center">
           <p className="text-[#E50914] text-lg mb-4">{error}</p>
           <button 
@@ -135,7 +142,7 @@ export default function Reports() {
   const averageBookingValue = totalBookings > 0 ? totalRevenue / totalBookings : 0;
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D] text-[#F5F5F5] p-6">
+    <div className="min-h-screen bg-[var(--bg-page)] text-[var(--text-primary)] p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
@@ -144,8 +151,8 @@ export default function Reports() {
               <FaChartBar className="mr-3" />
               Revenue Reports
             </h1>
-            <p className="text-[#F5F5F5]/70">Analyze revenue and booking trends within selected date range</p>
-            <p className="text-[#F5F5F5]/50 text-sm mt-1">💡 Tip: Adjust date range below to see different time periods</p>
+            <p className="text-[#475467]">Analyze revenue and booking trends within selected date range</p>
+            <p className="text-[#98A2B3] text-sm mt-1">💡 Tip: Adjust date range below to see different time periods</p>
           </div>
           <button 
             onClick={() => navigate('/admin/dashboard')}
@@ -156,7 +163,10 @@ export default function Reports() {
         </div>
 
         {/* Filters */}
-        <div className="bg-[#1A1A1A] border border-[#C8A951]/30 p-6 rounded-lg mb-6">
+        <div
+          className="bg-[var(--bg-card)] border border-[#E4E7EC] p-6 rounded-2xl mb-6"
+          style={{ boxShadow: 'var(--shadow-soft)' }}
+        >
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-medium text-[#C8A951] mb-1">
@@ -167,7 +177,7 @@ export default function Reports() {
                 type="date"
                 value={dateRange.startDate}
                 onChange={(e) => handleDateRangeChange('startDate', e.target.value)}
-                className="w-full bg-[#0D0D0D] border border-[#C8A951]/30 rounded p-2 text-[#F5F5F5] focus:border-[#C8A951] focus:outline-none"
+                className="w-full bg-white border border-[#E4E7EC] rounded-lg p-2 text-[var(--text-primary)] focus:border-[#C8A951] focus:ring-2 focus:ring-[#C8A951]/20 focus:outline-none"
               />
             </div>
             <div>
@@ -178,7 +188,7 @@ export default function Reports() {
                 type="date"
                 value={dateRange.endDate}
                 onChange={(e) => handleDateRangeChange('endDate', e.target.value)}
-                className="w-full bg-[#0D0D0D] border border-[#C8A951]/30 rounded p-2 text-[#F5F5F5] focus:border-[#C8A951] focus:outline-none"
+                className="w-full bg-white border border-[#E4E7EC] rounded-lg p-2 text-[var(--text-primary)] focus:border-[#C8A951] focus:ring-2 focus:ring-[#C8A951]/20 focus:outline-none"
               />
             </div>
             <div>
@@ -188,7 +198,7 @@ export default function Reports() {
               <select
                 value={dateRange.groupBy}
                 onChange={(e) => handleDateRangeChange('groupBy', e.target.value)}
-                className="w-full bg-[#0D0D0D] border border-[#C8A951]/30 rounded p-2 text-[#F5F5F5] focus:border-[#C8A951] focus:outline-none"
+                className="w-full bg-white border border-[#E4E7EC] rounded-lg p-2 text-[var(--text-primary)] focus:border-[#C8A951] focus:ring-2 focus:ring-[#C8A951]/20 focus:outline-none"
               >
                 <option value="day">Daily</option>
                 <option value="week">Weekly</option>
@@ -218,12 +228,15 @@ export default function Reports() {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-[#1A1A1A] border border-[#C8A951]/30 p-6 rounded-lg">
+          <div
+            className="bg-[var(--bg-card)] border border-[#E4E7EC] p-6 rounded-2xl"
+            style={{ boxShadow: 'var(--shadow-soft)' }}
+          >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[#F5F5F5]/70 text-sm">Total Revenue</p>
+                <p className="text-[#475467] text-sm">Total Revenue</p>
                 <p className="text-3xl font-bold text-[#C8A951]">{formatCurrency(totalRevenue)}</p>
-                <p className="text-xs text-[#F5F5F5]/50 mt-1">
+                <p className="text-xs text-[#98A2B3] mt-1">
                   {formatDate(dateRange.startDate)} - {formatDate(dateRange.endDate)}
                 </p>
               </div>
@@ -233,10 +246,13 @@ export default function Reports() {
             </div>
           </div>
           
-          <div className="bg-[#1A1A1A] border border-[#C8A951]/30 p-6 rounded-lg">
+          <div
+            className="bg-[var(--bg-card)] border border-[#E4E7EC] p-6 rounded-2xl"
+            style={{ boxShadow: 'var(--shadow-soft)' }}
+          >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[#F5F5F5]/70 text-sm">Total Bookings</p>
+                <p className="text-[#475467] text-sm">Total Bookings</p>
                 <p className="text-3xl font-bold text-[#C8A951]">{totalBookings}</p>
               </div>
               <div className="p-3 rounded-lg bg-blue-500">
@@ -245,10 +261,13 @@ export default function Reports() {
             </div>
           </div>
           
-          <div className="bg-[#1A1A1A] border border-[#C8A951]/30 p-6 rounded-lg">
+          <div
+            className="bg-[var(--bg-card)] border border-[#E4E7EC] p-6 rounded-2xl"
+            style={{ boxShadow: 'var(--shadow-soft)' }}
+          >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[#F5F5F5]/70 text-sm">Avg Booking Value</p>
+                <p className="text-[#475467] text-sm">Avg Booking Value</p>
                 <p className="text-3xl font-bold text-[#C8A951]">{formatCurrency(averageBookingValue)}</p>
               </div>
               <div className="p-3 rounded-lg bg-purple-500">
@@ -260,13 +279,16 @@ export default function Reports() {
 
         {/* Charts */}
         {totalBookings === 0 ? (
-          <div className="bg-[#1A1A1A] border border-[#C8A951]/30 p-8 rounded-lg text-center mb-8">
-            <FaChartBar className="text-6xl text-[#F5F5F5]/30 mb-4 mx-auto" />
-            <h3 className="text-xl font-semibold text-[#F5F5F5] mb-2">No Data Available</h3>
-            <p className="text-[#F5F5F5]/70 mb-4">
+          <div
+            className="bg-[var(--bg-card)] border border-[#E4E7EC] p-8 rounded-2xl text-center mb-8"
+            style={{ boxShadow: 'var(--shadow-soft)' }}
+          >
+            <FaChartBar className="text-6xl text-[#98A2B3] mb-4 mx-auto" />
+            <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-2">No Data Available</h3>
+            <p className="text-[#475467] mb-4">
               No bookings found for the selected date range ({formatDate(dateRange.startDate)} - {formatDate(dateRange.endDate)})
             </p>
-            <p className="text-[#F5F5F5]/50 text-sm mb-4">
+            <p className="text-[#98A2B3] text-sm mb-4">
               💡 Try expanding the date range or check if there are bookings in the system
             </p>
             <button
@@ -282,7 +304,7 @@ export default function Reports() {
             </button>
             <button
               onClick={() => navigate('/admin/bookings')}
-              className="bg-[#1A1A1A] text-[#F5F5F5] px-4 py-2 border border-[#C8A951]/30 rounded hover:bg-[#C8A951]/10 transition duration-300"
+              className="bg-white text-[var(--text-primary)] px-4 py-2 border border-[#E4E7EC] rounded-lg hover:bg-[var(--bg-muted)] transition duration-300"
             >
               View All Bookings
             </button>
@@ -291,27 +313,26 @@ export default function Reports() {
           <>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Revenue Trend Chart */}
-          <div className="bg-[#1A1A1A] border border-[#C8A951]/30 p-6 rounded-lg">
-            <h3 className="text-xl font-semibold text-[#C8A951] mb-4">Revenue Trend</h3>
+          <div
+            className="bg-[var(--bg-card)] border border-[#E4E7EC] p-6 rounded-2xl"
+            style={{ boxShadow: 'var(--shadow-soft)' }}
+          >
+            <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-4">Revenue Trend</h3>
             <ResponsiveContainer width="100%" height={400}>
               <LineChart data={revenueData?.revenueData || []}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#E4E7EC" />
                 <XAxis 
                   dataKey="_id" 
-                  stroke="#F5F5F5"
-                  tick={{ fontSize: 12 }}
+                  stroke="#1F2933"
+                  tick={{ fontSize: 12, fill: '#475467' }}
                 />
                 <YAxis 
-                  stroke="#F5F5F5"
-                  tick={{ fontSize: 12 }}
+                  stroke="#1F2933"
+                  tick={{ fontSize: 12, fill: '#475467' }}
                   tickFormatter={formatCurrency}
                 />
                 <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#1A1A1A', 
-                    border: '1px solid #C8A951',
-                    color: '#F5F5F5'
-                  }}
+                  contentStyle={tooltipStyles}
                   formatter={(value, name) => [
                     name === 'totalRevenue' ? formatCurrency(value) : value,
                     name === 'totalRevenue' ? 'Revenue' : 'Bookings'
@@ -337,30 +358,29 @@ export default function Reports() {
           </div>
 
           {/* Movie Revenue Chart */}
-          <div className="bg-[#1A1A1A] border border-[#C8A951]/30 p-6 rounded-lg">
-            <h3 className="text-xl font-semibold text-[#C8A951] mb-4">Top Movies by Revenue</h3>
+          <div
+            className="bg-[var(--bg-card)] border border-[#E4E7EC] p-6 rounded-2xl"
+            style={{ boxShadow: 'var(--shadow-soft)' }}
+          >
+            <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-4">Top Movies by Revenue</h3>
             <ResponsiveContainer width="100%" height={400}>
               <BarChart data={revenueData?.movieRevenue.slice(0, 8) || []}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#E4E7EC" />
                 <XAxis 
                   dataKey="movieName" 
-                  stroke="#F5F5F5"
-                  tick={{ fontSize: 10 }}
+                  stroke="#1F2933"
+                  tick={{ fontSize: 10, fill: '#475467' }}
                   angle={-45}
                   textAnchor="end"
                   height={100}
                 />
                 <YAxis 
-                  stroke="#F5F5F5"
-                  tick={{ fontSize: 12 }}
+                  stroke="#1F2933"
+                  tick={{ fontSize: 12, fill: '#475467' }}
                   tickFormatter={formatCurrency}
                 />
                 <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#1A1A1A', 
-                    border: '1px solid #C8A951',
-                    color: '#F5F5F5'
-                  }}
+                  contentStyle={tooltipStyles}
                   formatter={(value, name) => [
                     name === 'totalRevenue' ? formatCurrency(value) : value,
                     name === 'totalRevenue' ? 'Revenue' : 'Bookings'
@@ -374,8 +394,11 @@ export default function Reports() {
 
         {/* Revenue by Movie Pie Chart */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-[#1A1A1A] border border-[#C8A951]/30 p-6 rounded-lg">
-            <h3 className="text-xl font-semibold text-[#C8A951] mb-4">Revenue Distribution by Movie</h3>
+          <div
+            className="bg-[var(--bg-card)] border border-[#E4E7EC] p-6 rounded-2xl"
+            style={{ boxShadow: 'var(--shadow-soft)' }}
+          >
+            <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-4">Revenue Distribution by Movie</h3>
             <ResponsiveContainer width="100%" height={400}>
               <PieChart>
                 <Pie
@@ -393,11 +416,7 @@ export default function Reports() {
                   ))}
                 </Pie>
                 <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#1A1A1A', 
-                    border: '1px solid #C8A951',
-                    color: '#F5F5F5'
-                  }}
+                  contentStyle={tooltipStyles}
                   formatter={(value) => [formatCurrency(value), 'Revenue']}
                 />
               </PieChart>
@@ -405,8 +424,11 @@ export default function Reports() {
           </div>
 
           {/* Top Movies Table */}
-          <div className="bg-[#1A1A1A] border border-[#C8A951]/30 p-6 rounded-lg">
-            <h3 className="text-xl font-semibold text-[#C8A951] mb-4">Top Performing Movies</h3>
+          <div
+            className="bg-[var(--bg-card)] border border-[#E4E7EC] p-6 rounded-2xl"
+            style={{ boxShadow: 'var(--shadow-soft)' }}
+          >
+            <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-4">Top Performing Movies</h3>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -419,13 +441,13 @@ export default function Reports() {
                 </thead>
                 <tbody>
                   {(revenueData?.movieRevenue || []).slice(0, 10).map((movie, index) => (
-                    <tr key={index} className="border-b border-[#F5F5F5]/10">
-                      <td className="py-2 text-[#F5F5F5]">{movie.movieName}</td>
+                    <tr key={index} className="border-b border-[#E4E7EC]">
+                      <td className="py-2 text-[var(--text-primary)]">{movie.movieName}</td>
                       <td className="py-2 text-[#C8A951] font-semibold">
                         {formatCurrency(movie.totalRevenue)}
                       </td>
-                      <td className="py-2 text-[#F5F5F5]">{movie.bookingCount}</td>
-                      <td className="py-2 text-[#F5F5F5]">
+                      <td className="py-2 text-[var(--text-primary)]">{movie.bookingCount}</td>
+                      <td className="py-2 text-[var(--text-primary)]">
                         {formatCurrency(movie.totalRevenue / movie.bookingCount)}
                       </td>
                     </tr>

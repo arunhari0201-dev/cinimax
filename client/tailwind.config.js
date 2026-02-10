@@ -1,4 +1,6 @@
 
+const defaultTheme = require('tailwindcss/defaultTheme');
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -6,12 +8,15 @@ module.exports = {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
+    fontFamily: {
+      sans: ["Inter", ...defaultTheme.fontFamily.sans],
+    },
     extend: {
       fontFamily: {
-        inter: ["Inter", "sans-serif"],
-        playfair: ["Playfair Display", "serif"],
-        cinzel: ["Cinzel", "serif"],
-        poppins: ["Poppins", "sans-serif"],
+        inter: ["Inter", ...defaultTheme.fontFamily.sans],
+        poppins: ["Poppins", "Inter", ...defaultTheme.fontFamily.sans],
+        playfair: ["Poppins", "Inter", ...defaultTheme.fontFamily.sans],
+        cinzel: ["Poppins", "Inter", ...defaultTheme.fontFamily.sans],
       },
       animation: {
         fadeIn: 'fadeIn 1s ease-in forwards',

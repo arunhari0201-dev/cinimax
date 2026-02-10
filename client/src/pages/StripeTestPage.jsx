@@ -22,8 +22,8 @@ const StripeTestPage = () => {
         icon: 'warning',
         confirmButtonText: 'Sign In',
         confirmButtonColor: '#C8A951',
-        background: '#0D0D0D',
-        color: '#F5F5F5'
+        background: '#FFFFFF',
+        color: '#1F2933'
       }).then((result) => {
         if (result.isConfirmed) {
           navigate('/sign-in');
@@ -55,8 +55,8 @@ const StripeTestPage = () => {
         text: `Payment Intent Created: ${response.data.paymentIntentId}`,
         icon: 'success',
         confirmButtonColor: '#C8A951',
-        background: '#0D0D0D',
-        color: '#F5F5F5'
+        background: '#FFFFFF',
+        color: '#1F2933'
       });
 
     } catch (error) {
@@ -66,8 +66,8 @@ const StripeTestPage = () => {
         text: error.response?.data?.message || 'Payment test failed',
         icon: 'error',
         confirmButtonColor: '#E50914',
-        background: '#0D0D0D',
-        color: '#F5F5F5'
+        background: '#FFFFFF',
+        color: '#1F2933'
       });
     } finally {
       setLoading(false);

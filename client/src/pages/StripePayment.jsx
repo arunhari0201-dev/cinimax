@@ -17,17 +17,17 @@ const cardElementOptions = {
   style: {
     base: {
       fontSize: '16px',
-      color: '#F5F5F5',
-      backgroundColor: '#0D0D0D',
+      color: '#1F2933',
+      backgroundColor: '#FFFFFF',
       '::placeholder': {
-        color: '#F5F5F5',
-        opacity: 0.6,
+        color: '#98A2B3',
+        opacity: 1,
       },
-      iconColor: '#C8A951',
+      iconColor: '#C69D3C',
     },
     invalid: {
-      color: '#E50914',
-      iconColor: '#E50914',
+      color: '#D64545',
+      iconColor: '#D64545',
     },
   },
   hidePostalCode: true,
@@ -57,8 +57,8 @@ const PaymentForm = ({ bookingData, onPaymentSuccess }) => {
         icon: 'warning',
         confirmButtonText: 'Sign In',
         confirmButtonColor: '#C8A951',
-        background: '#0D0D0D',
-        color: '#F5F5F5'
+        background: '#FFFFFF',
+        color: '#1F2933'
       }).then((result) => {
         if (result.isConfirmed) {
           navigate('/sign-in');
@@ -110,8 +110,8 @@ const PaymentForm = ({ bookingData, onPaymentSuccess }) => {
             icon: 'warning',
             confirmButtonText: 'Sign In',
             confirmButtonColor: '#C8A951',
-            background: '#0D0D0D',
-            color: '#F5F5F5'
+            background: '#FFFFFF',
+            color: '#1F2933'
           }).then((result) => {
             if (result.isConfirmed) {
               navigate('/sign-in');
