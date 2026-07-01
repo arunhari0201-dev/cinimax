@@ -214,6 +214,14 @@ export const createBooking = async (req, res) => {
     
     await session.commitTransaction();
     session.endSession();
+
+    // Clean up Redis locks since booking is completed successfully
+    const redisClient = req.app.get('redis');
+    if (redisClient) {
+      for (const seatId of seatIds) {
+        await redisClient.del(`lock:showtime:${showtimeId}:seat:${seatId}`);
+      }
+    }
     
     // Populate the booking with related data for response
     const populatedBooking = await Booking.findById(savedBooking._id)

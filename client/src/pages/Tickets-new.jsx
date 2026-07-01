@@ -4,12 +4,12 @@ import Swal from 'sweetalert2';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faDollarSign, 
-  faCar, 
-  faMotorcycle, 
-  faSpinner, 
-  faExclamationCircle, 
+import {
+  faDollarSign,
+  faCar,
+  faMotorcycle,
+  faSpinner,
+  faExclamationCircle,
   faCheckCircle,
   faCouch,
   faChair,
@@ -19,10 +19,10 @@ import {
   faLock,
   faLockOpen
 } from '@fortawesome/free-solid-svg-icons';
-import { 
-  connectSocket, 
-  joinShowtimeRoom, 
-  leaveShowtimeRoom, 
+import {
+  connectSocket,
+  joinShowtimeRoom,
+  leaveShowtimeRoom,
   useSocket,
   holdSeat,
   releaseSeat,
@@ -37,11 +37,11 @@ const Tickets = () => {
   const { movieId, showtimeId } = useParams();
   const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state.user);
-  
+
   // Reference for selected seats to use in effects
   const selectedSeatsRef = useRef([]);
   const selectedParkingRef = useRef({ twoWheeler: [], fourWheeler: [] });
-  
+
   // State for data fetching
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -52,7 +52,7 @@ const Tickets = () => {
     twoWheeler: [],
     fourWheeler: []
   });
-  
+
   // State for user selections
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [totalCost, setTotalCost] = useState(0);
@@ -61,7 +61,7 @@ const Tickets = () => {
   const [selectedFourWheelerSlots, setSelectedFourWheelerSlots] = useState([]);
   const [phone, setPhone] = useState("");
   const [vehicleNumbers, setVehicleNumbers] = useState({ twoWheeler: [], fourWheeler: [] });
-  
+
   // Constants - Different prices for different categories
   const SEAT_PRICE = {
     STANDARD: 150,  // Updated to match database price
@@ -77,30 +77,30 @@ const Tickets = () => {
   };
   const TWO_WHEELER_PRICE = 50;
   const FOUR_WHEELER_PRICE = 100;
-  
+
   // Calculate parking cost
-  const parkingCost = selectedTwoWheelerSlots.length * TWO_WHEELER_PRICE + 
-                     selectedFourWheelerSlots.length * FOUR_WHEELER_PRICE;
-  
+  const parkingCost = selectedTwoWheelerSlots.length * TWO_WHEELER_PRICE +
+    selectedFourWheelerSlots.length * FOUR_WHEELER_PRICE;
+
   // API base URL
-  const backendUrl = 
-    process.env.NODE_ENV === 'production' 
-      ? 'https://cinimax.onrender.com' 
+  const backendUrl =
+    process.env.NODE_ENV === 'production'
+      ? 'https://cinimax.onrender.com'
       : 'http://localhost:5000';
-  
+
   // Setup socket connection with event handlers
   const { socket, isConnected } = useSocket([
-    { 
-      event: 'seatsUpdated', 
+    {
+      event: 'seatsUpdated',
       handler: ({ seats: updatedSeats }) => {
         if (!Array.isArray(updatedSeats)) {
           console.error("Received non-array seats update from socket:", updatedSeats);
           return;
         }
-        
+
         setSeats(prevSeats => {
           if (!Array.isArray(prevSeats) || prevSeats.length === 0) return updatedSeats;
-          
+
           return prevSeats.map(seat => {
             const updatedSeat = updatedSeats.find(us => us._id === seat._id);
             return updatedSeat ? updatedSeat : seat;
@@ -108,20 +108,20 @@ const Tickets = () => {
         });
       }
     },
-    { 
-      event: 'parkingUpdated', 
+    {
+      event: 'parkingUpdated',
       handler: ({ parkingSlots: updatedSlots }) => {
         setParkingSlots(prev => {
           const twoWheelers = prev.twoWheeler.map(slot => {
             const updated = updatedSlots.find(us => us._id === slot._id && us.type === 'twoWheeler');
             return updated ? updated : slot;
           });
-          
+
           const fourWheelers = prev.fourWheeler.map(slot => {
             const updated = updatedSlots.find(us => us._id === slot._id && us.type === 'fourWheeler');
             return updated ? updated : slot;
           });
-          
+
           return {
             twoWheeler: twoWheelers,
             fourWheeler: fourWheelers
@@ -129,8 +129,8 @@ const Tickets = () => {
         });
       }
     },
-    { 
-      event: 'holdExpired', 
+    {
+      event: 'holdExpired',
       handler: ({ type, itemId }) => {
         // Handle expired holds
         if (type === 'seat') {
@@ -140,7 +140,7 @@ const Tickets = () => {
         } else if (type === 'fourWheeler') {
           setSelectedFourWheelerSlots(prev => prev.filter(slot => slot._id !== itemId));
         }
-        
+
         // Show notification
         Swal.fire({
           title: 'Hold Expired',
@@ -152,7 +152,7 @@ const Tickets = () => {
       }
     }
   ]);
-  
+
   // Calculate total cost based on selected seats and parking
   useEffect(() => {
     // Calculate seat cost with different prices for different categories
@@ -160,10 +160,10 @@ const Tickets = () => {
       const price = SEAT_PRICE[seat.category] || SEAT_PRICE.STANDARD;
       return acc + price;
     }, 0) : 0;
-    
+
     // Add parking cost
     setTotalCost(seatCost + parkingCost);
-    
+
     // Update refs for use in cleanup
     selectedSeatsRef.current = selectedSeats;
     selectedParkingRef.current = {
@@ -187,13 +187,13 @@ const Tickets = () => {
       });
       return;
     }
-    
+
     // Check for valid params
     if (!movieId || !showtimeId || movieId === 'undefined' || showtimeId === 'undefined') {
       console.error('Invalid movieId or showtimeId', { movieId, showtimeId });
       setError('Invalid movie or showtime information. Please go back and try again.');
       setLoading(false);
-      
+
       // Show error modal with redirect option
       Swal.fire({
         title: 'Error',
@@ -209,30 +209,30 @@ const Tickets = () => {
       });
       return;
     }
-    
+
     // Fetch data
     fetchData();
-    
+
     // Cleanup function
     return () => {
       // Release all held seats and parking slots
       selectedSeatsRef.current.forEach(seat => {
         releaseSeat(showtimeId, seat._id);
       });
-      
+
       selectedParkingRef.current.twoWheeler.forEach(slot => {
         releaseParkingSlot(showtimeId, slot._id);
       });
-      
+
       selectedParkingRef.current.fourWheeler.forEach(slot => {
         releaseParkingSlot(showtimeId, slot._id);
       });
-      
+
       // Leave the showtime room
       leaveShowtimeRoom(showtimeId);
     };
   }, [movieId, showtimeId, currentUser]);
-  
+
   // Join showtime room when data is loaded
   useEffect(() => {
     if (showtimeData?._id) {
@@ -243,25 +243,25 @@ const Tickets = () => {
   const fetchData = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       // Double-check IDs before making requests
       if (!movieId || movieId === 'undefined' || !showtimeId || showtimeId === 'undefined') {
         throw new Error('Invalid movie or showtime ID');
       }
-      
+
       // Fetch showtime data
       const showtimeRes = await axios.get(`${backendUrl}/api/showtimes/${showtimeId}`, {
         withCredentials: true
       });
       setShowtimeData(showtimeRes.data);
-      
+
       // Fetch movie data
       const movieRes = await axios.get(`${backendUrl}/api/movies/${movieId}`, {
         withCredentials: true
       });
       setMovieData(movieRes.data);
-      
+
       // Fetch seats for this showtime with aggressive cache busting
       const timestamp = Date.now();
       const randomParam = Math.random().toString(36).substring(7);
@@ -272,7 +272,7 @@ const Tickets = () => {
       console.log('🔢 Number of seats:', seatsRes.data.length);
       console.log('📊 Sample seat data:', seatsRes.data.slice(0, 3));
       setSeats(seatsRes.data);
-      
+
       // Fetch parking slots for this showtime
       const parkingRes = await axios.get(`${backendUrl}/api/parking/showtime/${showtimeId}`, {
         withCredentials: true
@@ -281,10 +281,10 @@ const Tickets = () => {
         twoWheeler: parkingRes.data.twoWheelerSlots || [],
         fourWheeler: parkingRes.data.fourWheelerSlots || []
       });
-      
+
     } catch (err) {
       console.error('Error fetching data:', err);
-      
+
       // Handle authentication errors
       if (err.response?.status === 401 || err.response?.status === 403) {
         Swal.fire({
@@ -297,7 +297,7 @@ const Tickets = () => {
         });
         return;
       }
-      
+
       // Determine the specific error message
       let errorMessage = 'An error occurred while fetching data.';
       if (err.message === 'Invalid movie or showtime ID') {
@@ -312,9 +312,9 @@ const Tickets = () => {
       } else {
         errorMessage = err.response?.data?.message || errorMessage;
       }
-      
+
       setError(errorMessage);
-      
+
       // Add a button to return to homepage
       Swal.fire({
         title: 'Booking Error',
@@ -337,10 +337,10 @@ const Tickets = () => {
   const handleSeatSelection = (seat) => {
     // Can't select unavailable seats
     if (seat.status !== 'AVAILABLE') return;
-    
+
     setSelectedSeats(prev => {
       const isSelected = prev.some(s => s._id === seat._id);
-      
+
       if (isSelected) {
         // Release the seat
         releaseSeat(showtimeId, seat._id);
@@ -357,11 +357,11 @@ const Tickets = () => {
   const handleParkingSelection = (slot, type) => {
     // Can't select unavailable parking slots
     if (slot.status !== 'AVAILABLE') return;
-    
+
     if (type === 'twoWheeler') {
       setSelectedTwoWheelerSlots(prev => {
         const isSelected = prev.some(s => s._id === slot._id);
-        
+
         if (isSelected) {
           // Release the slot
           releaseParkingSlot(showtimeId, slot._id);
@@ -375,7 +375,7 @@ const Tickets = () => {
     } else if (type === 'fourWheeler') {
       setSelectedFourWheelerSlots(prev => {
         const isSelected = prev.some(s => s._id === slot._id);
-        
+
         if (isSelected) {
           // Release the slot
           releaseParkingSlot(showtimeId, slot._id);
@@ -413,7 +413,7 @@ const Tickets = () => {
     // Check if any seats or parking is selected - require phone verification for both
     const hasSeatsSelected = selectedSeats.length > 0;
     const hasParkingSelected = selectedTwoWheelerSlots.length > 0 || selectedFourWheelerSlots.length > 0;
-    
+
     if (hasSeatsSelected || hasParkingSelected) {
       // Phone number is required for any booking
       if (!phone || phone.trim() === '') {
@@ -491,14 +491,14 @@ const Tickets = () => {
         }
       }
     }
-    
+
     // Create booking data
     const bookingData = {
       showtimeId,
       movieId,
       seats: selectedSeats.map(seat => seat._id),
       parkingSlots: [
-        ...selectedTwoWheelerSlots.map(slot => ({ 
+        ...selectedTwoWheelerSlots.map(slot => ({
           slotId: slot._id,
           vehicleNumber: vehicleNumbers.twoWheeler[selectedTwoWheelerSlots.indexOf(slot)] || ''
         })),
@@ -510,10 +510,10 @@ const Tickets = () => {
       phone,
       totalCost
     };
-    
+
     // Navigate to payment method selection page with booking data
-    navigate('/payment-method', { 
-      state: { 
+    navigate('/payment-method', {
+      state: {
         bookingData,
         movieDetails: movieData,
         showtimeDetails: showtimeData,
@@ -522,25 +522,25 @@ const Tickets = () => {
           twoWheeler: selectedTwoWheelerSlots,
           fourWheeler: selectedFourWheelerSlots
         }
-      } 
+      }
     });
   };
 
   // Toggle parking needed
   const handleToggleParkingNeeded = () => {
     setParkingNeeded(!parkingNeeded);
-    
+
     // Clear parking selections if turning off parking
     if (parkingNeeded) {
       // Release all selected parking slots
       selectedTwoWheelerSlots.forEach(slot => {
         releaseParkingSlot(showtimeId, slot._id);
       });
-      
+
       selectedFourWheelerSlots.forEach(slot => {
         releaseParkingSlot(showtimeId, slot._id);
       });
-      
+
       setSelectedTwoWheelerSlots([]);
       setSelectedFourWheelerSlots([]);
       setVehicleNumbers({ twoWheeler: [], fourWheeler: [] });
@@ -551,57 +551,29 @@ const Tickets = () => {
   const renderSeat = (seat) => {
     // Determine seat status class
     let seatClass = '';
-    let categoryStyle = '';
-    
-    // Base category styling - different background colors for each category
-    const categoryLower = (seat.category || '').toLowerCase();
-    
-    if (categoryLower.includes('premium') || categoryLower.includes('platinum')) {
-      categoryStyle = 'bg-gradient-to-br from-blue-600 to-blue-700 border-2 border-blue-400';
-    } else if (categoryLower.includes('vip') || categoryLower.includes('diamond') || categoryLower.includes('balcony')) {
-      categoryStyle = 'bg-gradient-to-br from-purple-600 to-purple-700 border-2 border-purple-400';
-    } else {
-      // Standard seats (including STANDARD, Standard, Gold, Silver, or any other category)
-      categoryStyle = 'bg-gradient-to-br from-gray-600 to-gray-700 border border-gray-400';
-    }
-    
+
     // Override with status colors
     if (Array.isArray(selectedSeats) && selectedSeats.some(s => s._id === seat._id)) {
-      seatClass = 'bg-gradient-to-br from-[#C8A951] to-[#DFBD69] border-2 border-[#F4D03F] shadow-lg shadow-[#C8A951]/50'; // selected
-    } else if (seat.status === 'HELD') {
-      seatClass = 'bg-gradient-to-br from-yellow-500 to-yellow-600 border-2 border-yellow-300 cursor-not-allowed'; // held
-    } else if (seat.status === 'SOLD') {
-      seatClass = 'bg-gradient-to-br from-red-500 to-red-600 border-2 border-red-300 cursor-not-allowed'; // sold
+      // Selected: Bright Orange matching the new design template
+      seatClass = 'bg-[#ff7a00] text-white border border-[#e06b00] shadow-[0_0_12px_rgba(255,122,0,0.4)] scale-105 font-black';
+    } else if (seat.status === 'HELD' || seat.status === 'SOLD') {
+      // Sold/Held: Dark Slate Blue matching the background style of unavailable seats
+      seatClass = 'bg-[#252839] text-[#4d5375]/60 border border-[#343950] cursor-not-allowed';
     } else {
-      seatClass = categoryStyle + ' hover:brightness-110 hover:scale-105'; // available with category style
+      // Available: Soft Slate/Purple-Grey
+      seatClass = 'bg-[#787d9a] hover:bg-[#8e94b7] text-[#181b27] border border-[#636885]/30 hover:scale-105';
     }
-    
+
     return (
-      <div 
+      <div
         key={seat._id}
         onClick={() => handleSeatSelection(seat)}
-        className={`${seatClass} w-10 h-10 flex items-center justify-center 
-                  text-white text-xs font-bold rounded-lg cursor-pointer transition-all duration-200
+        className={`${seatClass} w-8 h-8 flex items-center justify-center 
+                  text-[10px] font-bold rounded-t-[8px] rounded-b-[2px] cursor-pointer transition-all duration-200
                   hover:shadow-lg relative`}
         title={`${seat.seatNumber} - ${seat.category} (₹${SEAT_PRICE[seat.category] || SEAT_PRICE.STANDARD})`}
       >
         {seat.parsedNumber}
-        
-        {/* Category indicator icon */}
-        <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full text-[8px] flex items-center justify-center font-bold">
-          {/* Premium category indicator */}
-          {(categoryLower.includes('premium') || categoryLower.includes('platinum')) && 
-            <div className="w-2 h-2 bg-blue-300 rounded-full"></div>}
-          
-          {/* VIP category indicator */}
-          {(categoryLower.includes('vip') || categoryLower.includes('diamond') || categoryLower.includes('balcony')) && 
-            <div className="w-2 h-2 bg-purple-300 rounded-full"></div>}
-          
-          {/* Standard category indicator (default for all others) */}
-          {!(categoryLower.includes('premium') || categoryLower.includes('platinum') || 
-             categoryLower.includes('vip') || categoryLower.includes('diamond') || categoryLower.includes('balcony')) && 
-            <div className="w-2 h-2 bg-gray-300 rounded-full"></div>}
-        </div>
       </div>
     );
   };
@@ -612,7 +584,7 @@ const Tickets = () => {
     const seatNumber = seat.seatNumber || '';
     const rowMatch = seatNumber.match(/^([A-Z]+)/);
     const row = rowMatch ? rowMatch[1] : 'Unknown';
-    
+
     if (!acc[row]) acc[row] = [];
     acc[row].push({
       ...seat,
@@ -625,12 +597,12 @@ const Tickets = () => {
   // Debug seat grouping
   console.log('Total seats:', seats.length);
   console.log('Row keys:', Object.keys(seatsByRow));
-  
+
   // Debug seat categories (can be removed in production)
   if (seats.length > 0) {
     const uniqueCategories = [...new Set(seats.map(seat => seat.category))];
     console.log('Unique seat categories found:', uniqueCategories);
-    
+
     // Show detailed breakdown by category
     const categoryBreakdown = {};
     seats.forEach(seat => {
@@ -640,17 +612,17 @@ const Tickets = () => {
       }
       categoryBreakdown[category].push(seat.seatNumber);
     });
-    
+
     console.log('Category breakdown:', categoryBreakdown);
     console.log('Current showtime ID:', showtimeId);
     console.log('Sample seats from each row:');
     ['A', 'F', 'K'].forEach(row => {
       const rowSeats = seats.filter(seat => seat.seatNumber?.startsWith(row));
       if (rowSeats.length > 0) {
-        console.log(`Row ${row} sample:`, rowSeats.slice(0, 2).map(s => ({ 
-          seatNumber: s.seatNumber, 
-          category: s.category, 
-          price: s.price 
+        console.log(`Row ${row} sample:`, rowSeats.slice(0, 2).map(s => ({
+          seatNumber: s.seatNumber,
+          category: s.category,
+          price: s.price
         })));
       }
     });
@@ -695,8 +667,8 @@ const Tickets = () => {
           <div className="bg-[#1A1A1A] p-6 rounded-lg shadow-lg mb-8 border border-[#C8A951]/20">
             <div className="flex flex-col md:flex-row items-start gap-6">
               <div className="w-full md:w-1/4">
-                <img 
-                  src={getMovieImage(movieData)} 
+                <img
+                  src={getMovieImage(movieData)}
                   alt={movieData.name}
                   className="w-full h-auto rounded-lg shadow-md"
                   onError={(e) => {
@@ -712,10 +684,10 @@ const Tickets = () => {
                   }}
                 />
               </div>
-              
+
               <div className="w-full md:w-3/4">
                 <h1 className="text-3xl font-bold text-[#F5F5F5] mb-2">{movieData.name}</h1>
-                
+
                 <div className="flex flex-wrap gap-2 mb-4">
                   <span className="px-3 py-1 bg-[#C8A951] text-[#0D0D0D] font-semibold text-sm rounded-full">
                     {movieData.genre}
@@ -727,7 +699,7 @@ const Tickets = () => {
                     {movieData.rating}
                   </span>
                 </div>
-                
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                   <div>
                     <div className="flex items-center text-[#F5F5F5] mb-2">
@@ -735,7 +707,7 @@ const Tickets = () => {
                       <span className="font-medium">Screen:</span>
                       <span className="ml-2">{showtimeData.screen || 'Loading...'}</span>
                     </div>
-                    
+
                     <div className="flex items-center text-[#F5F5F5] mb-2">
                       <FontAwesomeIcon icon={faClock} className="w-5 h-5 mr-2 text-[#C8A951]" />
                       <span className="font-medium">Date:</span>
@@ -743,30 +715,30 @@ const Tickets = () => {
                         {showtimeData.startTime ? new Date(showtimeData.startTime).toLocaleDateString() : 'Loading...'}
                       </span>
                     </div>
-                    
+
                     <div className="flex items-center text-[#F5F5F5]">
                       <FontAwesomeIcon icon={faClock} className="w-5 h-5 mr-2 text-[#C8A951]" />
                       <span className="font-medium">Time:</span>
                       <span className="ml-2">
-                        {showtimeData.startTime ? new Date(showtimeData.startTime).toLocaleTimeString([], { 
-                          hour: '2-digit', 
-                          minute: '2-digit' 
+                        {showtimeData.startTime ? new Date(showtimeData.startTime).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit'
                         }) : 'Loading...'}
                       </span>
                     </div>
                   </div>
-                  
+
                   <div>
                     <div className="flex items-center text-[#F5F5F5] mb-2">
                       <FontAwesomeIcon icon={faUsers} className="w-5 h-5 mr-2 text-[#C8A951]" />
                       <span className="font-medium">Available Seats:</span>
                       <span className="ml-2">
-                        {Array.isArray(seats) ? 
+                        {Array.isArray(seats) ?
                           `${seats.filter(seat => seat.status === 'AVAILABLE').length} / ${seats.length}` :
                           'Loading...'}
                       </span>
                     </div>
-                    
+
                     <div className="flex items-center text-[#F5F5F5]">
                       <FontAwesomeIcon icon={faDollarSign} className="w-5 h-5 mr-2 text-[#C8A951]" />
                       <span className="font-medium">Current Selection:</span>
@@ -774,7 +746,7 @@ const Tickets = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Socket connection status */}
                 <div className="flex items-center mt-4">
                   <div className={`w-3 h-3 rounded-full mr-2 ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
@@ -786,18 +758,18 @@ const Tickets = () => {
             </div>
           </div>
         )}
-        
+
         {/* Seat selection */}
         <div className="bg-[#1A1A1A] p-6 rounded-lg shadow-lg mb-8 border border-[#C8A951]/20">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold text-[#F5F5F5]">
               Select Your Seats
             </h2>
-            
+
             <button
               onClick={() => {
                 console.log('🔄 Force refreshing seat data with cache bypass...');
-                
+
                 // Clear any potential cache
                 if (typeof localStorage !== 'undefined') {
                   localStorage.removeItem(`seats_${showtimeId}`);
@@ -805,11 +777,11 @@ const Tickets = () => {
                 if (typeof sessionStorage !== 'undefined') {
                   sessionStorage.removeItem(`seats_${showtimeId}`);
                 }
-                
+
                 // Reset state first
                 setSeats([]);
                 setLoading(true);
-                
+
                 // Force refresh with timestamp
                 fetchData();
               }}
@@ -818,114 +790,95 @@ const Tickets = () => {
               🔄 Force Refresh Seats
             </button>
           </div>
-          
-          <div className="w-full flex justify-center mb-8">
-            <div className="w-full max-w-3xl">
-              <div className="bg-[#C8A951] text-center text-[#0D0D0D] font-semibold p-2 mb-8 rounded">
-                SCREEN
-              </div>
-              
-              {/* Seats arrangement with cinema-style layout */}
-              <div className="space-y-3">
-                {Object.keys(seatsByRow).sort().map(row => {
-                  const rowSeats = seatsByRow[row].sort((a, b) => parseInt(a.parsedNumber) - parseInt(b.parsedNumber));
-                  
-                  // Split seats into left, center, and right sections for aisle effect
-                  const totalSeats = rowSeats.length;
-                  const leftSectionEnd = Math.floor(totalSeats * 0.25);
-                  const rightSectionStart = Math.floor(totalSeats * 0.75);
-                  
-                  const leftSeats = rowSeats.slice(0, leftSectionEnd);
-                  const centerSeats = rowSeats.slice(leftSectionEnd, rightSectionStart);
-                  const rightSeats = rowSeats.slice(rightSectionStart);
 
-                  return (
-                    <div key={row} className="flex justify-center items-center">
-                      {/* Row Label */}
-                      <div className="w-8 flex items-center justify-center text-[#C8A951] font-bold text-lg">
-                        {row}
-                      </div>
-                      
-                      {/* Left Section */}
-                      <div className="flex gap-1">
-                        {leftSeats.map(seat => renderSeat(seat))}
-                      </div>
-                      
-                      {/* Left Aisle */}
-                      <div className="w-8"></div>
-                      
-                      {/* Center Section */}
-                      <div className="flex gap-1">
-                        {centerSeats.map(seat => renderSeat(seat))}
-                      </div>
-                      
-                      {/* Right Aisle */}
-                      <div className="w-8"></div>
-                      
-                      {/* Right Section */}
-                      <div className="flex gap-1">
-                        {rightSeats.map(seat => renderSeat(seat))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              
-              {/* Seat categories with different prices and visual styles */}
-              <div className="flex justify-center mt-8 space-x-8 flex-wrap gap-y-4">
-                <div className="flex items-center">
-                  <div className="w-6 h-6 bg-gradient-to-br from-gray-600 to-gray-700 border border-gray-400 mr-3 rounded-lg relative">
-                    <div className="absolute -top-1 -right-1 w-2 h-2 bg-gray-300 rounded-full"></div>
-                  </div>
-                  <span className="text-[#F5F5F5] text-sm font-medium">Standard (₹{SEAT_PRICE.STANDARD})</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-6 h-6 bg-gradient-to-br from-blue-600 to-blue-700 border-2 border-blue-400 mr-3 rounded-lg relative">
-                    <div className="absolute -top-1 -right-1 w-2 h-2 bg-blue-300 rounded-full"></div>
-                  </div>
-                  <span className="text-[#F5F5F5] text-sm font-medium">Premium (₹{SEAT_PRICE.PREMIUM})</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-6 h-6 bg-gradient-to-br from-purple-600 to-purple-700 border-2 border-purple-400 mr-3 rounded-lg relative">
-                    <div className="absolute -top-1 -right-1 w-2 h-2 bg-purple-300 rounded-full"></div>
-                  </div>
-                  <span className="text-[#F5F5F5] text-sm font-medium">VIP (₹{SEAT_PRICE.VIP})</span>
+          <div className="w-full flex justify-center mb-8 overflow-x-auto">
+            <div className="w-full min-w-[700px] max-w-4xl p-10 bg-[#181b27] rounded-3xl border border-neutral-900 shadow-2xl">
+
+              {/* Thin Curved Line Screen at the top */}
+              <div className="w-full flex justify-center mb-16 relative">
+                <div className="w-[70%] max-w-xl h-[4px] relative">
+                  <svg viewBox="0 0 100 10" className="w-full overflow-visible">
+                    <path d="M 0,8 Q 50,0 100,8" fill="none" stroke="#787d9a" strokeWidth="1.5" opacity="0.45" />
+                  </svg>
                 </div>
               </div>
-              
-              {/* Status indicators */}
-              <div className="flex justify-center mt-6 space-x-6 flex-wrap gap-y-2">
+
+              {/* Seats arrangement in 4 quadrants (vertical central aisle + horizontal aisle after row 4) */}
+              <div className="space-y-3">
+                {(() => {
+                  const sortedRowKeys = Object.keys(seatsByRow).sort().reverse();
+                  return sortedRowKeys.map((row, rowIndex) => {
+                    const rowSeats = seatsByRow[row];
+                    const sortedSeats = [...rowSeats].sort((a, b) => parseInt(a.parsedNumber) - parseInt(b.parsedNumber));
+
+                    // Row Number (1-indexed from top to bottom)
+                    const rowNumber = rowIndex + 1;
+
+                    // Split the row in half for the vertical center aisle
+                    const halfIndex = Math.ceil(sortedSeats.length / 2);
+                    const leftHalf = sortedSeats.slice(0, halfIndex);
+                    const rightHalf = sortedSeats.slice(halfIndex);
+
+                    return (
+                      <React.Fragment key={row}>
+                        <div className="flex justify-center items-center">
+                          {/* Left Half Seats */}
+                          <div className="flex gap-2">
+                            {leftHalf.map(seat => renderSeat(seat))}
+                          </div>
+
+                          {/* Vertical Center Aisle */}
+                          <div className="w-12 flex-shrink-0"></div>
+
+                          {/* Right Half Seats */}
+                          <div className="flex gap-2">
+                            {rightHalf.map(seat => renderSeat(seat))}
+                          </div>
+
+                          {/* Row Number Label on the Right */}
+                          <div className="w-10 flex items-center justify-center text-gray-500 font-bold text-sm ml-4">
+                            {rowNumber}
+                          </div>
+                        </div>
+
+                        {/* Horizontal Aisle gap after Row 4 */}
+                        {rowNumber === 4 && (
+                          <div className="h-10 w-full" />
+                        )}
+                      </React.Fragment>
+                    );
+                  });
+                })()}
+              </div>
+
+              {/* Legend matching the design layout */}
+              <div className="w-full border-t border-neutral-900 my-8"></div>
+
+              <div className="flex justify-center space-x-8 flex-wrap gap-y-4">
                 <div className="flex items-center">
-                  <div className="w-5 h-5 bg-gradient-to-br from-gray-600 to-gray-700 border border-gray-400 rounded-lg mr-2"></div>
-                  <span className="text-[#F5F5F5] text-xs">Available</span>
+                  <div className="w-5 h-5 bg-[#787d9a] border border-[#636885]/30 rounded-t-[6px] rounded-b-[2px]"></div>
+                  <span className="text-[#787d9a] text-xs font-semibold ml-2">Available</span>
                 </div>
-                
                 <div className="flex items-center">
-                  <div className="w-5 h-5 bg-gradient-to-br from-[#C8A951] to-[#DFBD69] border-2 border-[#F4D03F] rounded-lg mr-2"></div>
-                  <span className="text-[#F5F5F5] text-xs">Selected</span>
+                  <div className="w-5 h-5 bg-[#ff7a00] border border-[#e06b00] rounded-t-[6px] rounded-b-[2px]"></div>
+                  <span className="text-[#ff7a00] text-xs font-semibold ml-2">Selected</span>
                 </div>
-                
                 <div className="flex items-center">
-                  <div className="w-5 h-5 bg-gradient-to-br from-yellow-500 to-yellow-600 border-2 border-yellow-300 rounded-lg mr-2"></div>
-                  <span className="text-[#F5F5F5] text-xs">Held</span>
-                </div>
-                
-                <div className="flex items-center">
-                  <div className="w-5 h-5 bg-gradient-to-br from-red-500 to-red-600 border-2 border-red-300 rounded-lg mr-2"></div>
-                  <span className="text-[#F5F5F5] text-xs">Sold</span>
+                  <div className="w-5 h-5 bg-[#252839] border border-[#343950] rounded-t-[6px] rounded-b-[2px]"></div>
+                  <span className="text-[#4d5375] text-xs font-semibold ml-2">Sold / Held</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        
+
         {/* Parking section */}
         <div className="bg-[#1A1A1A] p-6 rounded-lg shadow-lg mb-8 border border-[#C8A951]/20">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-semibold text-[#F5F5F5]">
               Valet Parking
             </h2>
-            
+
             <button
               onClick={handleToggleParkingNeeded}
               className={`px-4 py-2 rounded-md flex items-center transition
@@ -933,14 +886,14 @@ const Tickets = () => {
                   ? 'bg-[#C8A951] hover:bg-[#DFBD69] text-[#0D0D0D] font-semibold'
                   : 'bg-[#3A3A3A] hover:bg-[#4A4A4A] text-[#F5F5F5]'}`}
             >
-              <FontAwesomeIcon 
-                icon={parkingNeeded ? faLock : faLockOpen} 
-                className="mr-2" 
+              <FontAwesomeIcon
+                icon={parkingNeeded ? faLock : faLockOpen}
+                className="mr-2"
               />
               {parkingNeeded ? 'Parking Selected' : 'Add Parking'}
             </button>
           </div>
-          
+
           {parkingNeeded && (
             <div className="space-y-6">
               {/* Two Wheeler Parking */}
@@ -949,12 +902,12 @@ const Tickets = () => {
                   <FontAwesomeIcon icon={faMotorcycle} className="mr-2 text-[#C8A951]" />
                   Two Wheeler Parking (₹{TWO_WHEELER_PRICE}/slot)
                 </h3>
-                
+
                 <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
                   {parkingSlots.twoWheeler.map(slot => {
                     // Determine slot status class
                     let slotClass = 'bg-[#3A3A3A] hover:bg-[#4A4A4A]'; // available
-                    
+
                     if (selectedTwoWheelerSlots.some(s => s._id === slot._id)) {
                       slotClass = 'bg-[#C8A951] hover:bg-[#DFBD69]'; // selected by current user
                     } else if (slot.status === 'HELD') {
@@ -962,9 +915,9 @@ const Tickets = () => {
                     } else if (slot.status === 'SOLD') {
                       slotClass = 'bg-red-500 cursor-not-allowed'; // sold
                     }
-                    
+
                     return (
-                      <div 
+                      <div
                         key={slot._id}
                         onClick={() => handleParkingSelection(slot, 'twoWheeler')}
                         className={`${slotClass} p-3 flex items-center justify-center 
@@ -978,7 +931,7 @@ const Tickets = () => {
                     );
                   })}
                 </div>
-                
+
                 {/* Vehicle number inputs */}
                 {selectedTwoWheelerSlots.length > 0 && (
                   <div className="mt-4">
@@ -987,38 +940,38 @@ const Tickets = () => {
                       Vehicle numbers are required for all selected parking slots (e.g., TN01AB1234)
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                    {selectedTwoWheelerSlots.map((slot, index) => (
-                      <div key={slot._id} className="flex items-center">
-                        <span className="text-[#F5F5F5] mr-2 whitespace-nowrap">
-                          {slot.slotNumber}:
-                        </span>
-                        <input
-                          type="text"
-                          placeholder="Vehicle Number *"
-                          value={vehicleNumbers.twoWheeler[index] || ''}
-                          onChange={(e) => handleVehicleNumberChange('twoWheeler', index, e.target.value)}
-                          className="bg-[#1A1A1A] border-2 border-[#C8A951] text-[#F5F5F5] px-3 py-1 rounded-md w-full focus:border-[#DFBD69] focus:ring-2 focus:ring-[#C8A951]/20 focus:outline-none transition-all duration-300"
-                          required
-                        />
-                      </div>
-                    ))}
+                      {selectedTwoWheelerSlots.map((slot, index) => (
+                        <div key={slot._id} className="flex items-center">
+                          <span className="text-[#F5F5F5] mr-2 whitespace-nowrap">
+                            {slot.slotNumber}:
+                          </span>
+                          <input
+                            type="text"
+                            placeholder="Vehicle Number *"
+                            value={vehicleNumbers.twoWheeler[index] || ''}
+                            onChange={(e) => handleVehicleNumberChange('twoWheeler', index, e.target.value)}
+                            className="bg-[#1A1A1A] border-2 border-[#C8A951] text-[#F5F5F5] px-3 py-1 rounded-md w-full focus:border-[#DFBD69] focus:ring-2 focus:ring-[#C8A951]/20 focus:outline-none transition-all duration-300"
+                            required
+                          />
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}
               </div>
-              
+
               {/* Four Wheeler Parking */}
               <div>
                 <h3 className="text-xl font-medium text-[#F5F5F5] mb-4 flex items-center">
                   <FontAwesomeIcon icon={faCar} className="mr-2 text-[#C8A951]" />
                   Four Wheeler Parking (₹{FOUR_WHEELER_PRICE}/slot)
                 </h3>
-                
+
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
                   {parkingSlots.fourWheeler.map(slot => {
                     // Determine slot status class
                     let slotClass = 'bg-[#3A3A3A] hover:bg-[#4A4A4A]'; // available
-                    
+
                     if (selectedFourWheelerSlots.some(s => s._id === slot._id)) {
                       slotClass = 'bg-[#C8A951] hover:bg-[#DFBD69]'; // selected by current user
                     } else if (slot.status === 'HELD') {
@@ -1026,9 +979,9 @@ const Tickets = () => {
                     } else if (slot.status === 'SOLD') {
                       slotClass = 'bg-red-500 cursor-not-allowed'; // sold
                     }
-                    
+
                     return (
-                      <div 
+                      <div
                         key={slot._id}
                         onClick={() => handleParkingSelection(slot, 'fourWheeler')}
                         className={`${slotClass} p-4 flex items-center justify-center 
@@ -1042,7 +995,7 @@ const Tickets = () => {
                     );
                   })}
                 </div>
-                
+
                 {/* Vehicle number inputs */}
                 {selectedFourWheelerSlots.length > 0 && (
                   <div className="mt-4">
@@ -1051,21 +1004,21 @@ const Tickets = () => {
                       Vehicle numbers are required for all selected parking slots (e.g., TN01AB1234)
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                    {selectedFourWheelerSlots.map((slot, index) => (
-                      <div key={slot._id} className="flex items-center">
-                        <span className="text-[#F5F5F5] mr-2 whitespace-nowrap">
-                          {slot.slotNumber}:
-                        </span>
-                        <input
-                          type="text"
-                          placeholder="Vehicle Number *"
-                          value={vehicleNumbers.fourWheeler[index] || ''}
-                          onChange={(e) => handleVehicleNumberChange('fourWheeler', index, e.target.value)}
-                          className="bg-[#1A1A1A] border-2 border-[#C8A951] text-[#F5F5F5] px-3 py-1 rounded-md w-full focus:border-[#DFBD69] focus:ring-2 focus:ring-[#C8A951]/20 focus:outline-none transition-all duration-300"
-                          required
-                        />
-                      </div>
-                    ))}
+                      {selectedFourWheelerSlots.map((slot, index) => (
+                        <div key={slot._id} className="flex items-center">
+                          <span className="text-[#F5F5F5] mr-2 whitespace-nowrap">
+                            {slot.slotNumber}:
+                          </span>
+                          <input
+                            type="text"
+                            placeholder="Vehicle Number *"
+                            value={vehicleNumbers.fourWheeler[index] || ''}
+                            onChange={(e) => handleVehicleNumberChange('fourWheeler', index, e.target.value)}
+                            className="bg-[#1A1A1A] border-2 border-[#C8A951] text-[#F5F5F5] px-3 py-1 rounded-md w-full focus:border-[#DFBD69] focus:ring-2 focus:ring-[#C8A951]/20 focus:outline-none transition-all duration-300"
+                            required
+                          />
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}
@@ -1073,21 +1026,20 @@ const Tickets = () => {
             </div>
           )}
         </div>
-        
+
         {/* Contact information */}
         <div className="bg-[#1A1A1A] p-6 rounded-lg shadow-lg mb-8 border border-[#C8A951]/20">
           <h2 className="text-2xl font-semibold text-[#F5F5F5] mb-4">
             Contact Information
           </h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
               <div>
-                <label className={`block mb-1 ${
-                  (selectedSeats.length > 0 || selectedTwoWheelerSlots.length > 0 || selectedFourWheelerSlots.length > 0) 
-                    ? 'text-[#C8A951] font-semibold' 
+                <label className={`block mb-1 ${(selectedSeats.length > 0 || selectedTwoWheelerSlots.length > 0 || selectedFourWheelerSlots.length > 0)
+                    ? 'text-[#C8A951] font-semibold'
                     : 'text-[#F5F5F5]'
-                }`}>
+                  }`}>
                   Phone Number {(selectedSeats.length > 0 || selectedTwoWheelerSlots.length > 0 || selectedFourWheelerSlots.length > 0) && (
                     <span className="text-red-400">*</span>
                   )}
@@ -1101,11 +1053,10 @@ const Tickets = () => {
                     placeholder="Enter your phone number"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className={`flex-1 px-4 py-2 rounded-md transition-all duration-300 ${
-                      (selectedSeats.length > 0 || selectedTwoWheelerSlots.length > 0 || selectedFourWheelerSlots.length > 0)
+                    className={`flex-1 px-4 py-2 rounded-md transition-all duration-300 ${(selectedSeats.length > 0 || selectedTwoWheelerSlots.length > 0 || selectedFourWheelerSlots.length > 0)
                         ? 'bg-[#1A1A1A] border-2 border-[#C8A951] text-[#F5F5F5] focus:border-[#DFBD69] focus:ring-2 focus:ring-[#C8A951]/20'
                         : 'bg-[#1A1A1A] border border-gray-600 text-[#F5F5F5] focus:border-[#C8A951] focus:ring-1 focus:ring-[#C8A951]/20'
-                    } focus:outline-none`}
+                      } focus:outline-none`}
                     required={selectedSeats.length > 0 || selectedTwoWheelerSlots.length > 0 || selectedFourWheelerSlots.length > 0}
                   />
                 </div>
@@ -1113,25 +1064,25 @@ const Tickets = () => {
             </div>
           </div>
         </div>
-        
+
         {/* Summary and checkout */}
         <div className="bg-[#1A1A1A] p-6 rounded-lg shadow-lg border border-[#C8A951]/20">
           <h2 className="text-2xl font-semibold text-[#F5F5F5] mb-4">
             Booking Summary
           </h2>
-          
+
           <div className="space-y-2 mb-6">
             <div className="flex justify-between">
               <span className="text-[#F5F5F5]/80">Selected Seats:</span>
               <span className="text-[#F5F5F5] font-medium">
-                {!Array.isArray(selectedSeats) || selectedSeats.length === 0 ? 'None' : 
-                 selectedSeats.map(seat => {
-                   console.log('Seat object:', seat); // Debug log
-                   return seat.seatNumber || 'Unknown';
-                 }).join(', ')}
+                {!Array.isArray(selectedSeats) || selectedSeats.length === 0 ? 'None' :
+                  selectedSeats.map(seat => {
+                    console.log('Seat object:', seat); // Debug log
+                    return seat.seatNumber || 'Unknown';
+                  }).join(', ')}
               </span>
             </div>
-            
+
             <div className="flex justify-between">
               <span className="text-[#F5F5F5]/80">Seats Cost:</span>
               <span className="text-[#F5F5F5] font-medium">
@@ -1141,7 +1092,7 @@ const Tickets = () => {
                 }, 0) : 0}
               </span>
             </div>
-            
+
             {/* Show individual seat breakdown if seats are selected */}
             {Array.isArray(selectedSeats) && selectedSeats.length > 0 && (
               <div className="text-xs text-[#F5F5F5]/60 mt-1 mb-2">
@@ -1156,7 +1107,7 @@ const Tickets = () => {
                 })}
               </div>
             )}
-            
+
             {parkingNeeded && (
               <>
                 <div className="flex justify-between">
@@ -1165,7 +1116,7 @@ const Tickets = () => {
                     {selectedTwoWheelerSlots.length} × ₹{TWO_WHEELER_PRICE} = ₹{selectedTwoWheelerSlots.length * TWO_WHEELER_PRICE}
                   </span>
                 </div>
-                
+
                 <div className="flex justify-between">
                   <span className="text-[#F5F5F5]/80">Four Wheeler Parking:</span>
                   <span className="text-[#F5F5F5] font-medium">
@@ -1174,7 +1125,7 @@ const Tickets = () => {
                 </div>
               </>
             )}
-            
+
             <div className="border-t border-[#C8A951]/30 pt-2 mt-2">
               <div className="flex justify-between text-lg">
                 <span className="text-[#C8A951] font-semibold">Total Cost:</span>
@@ -1182,12 +1133,12 @@ const Tickets = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="flex justify-end">
             <button
               onClick={handleProceedToPayment}
               disabled={
-                !Array.isArray(selectedSeats) || 
+                !Array.isArray(selectedSeats) ||
                 selectedSeats.length === 0
               }
               className="px-6 py-3 bg-[#C8A951] hover:bg-[#DFBD69] text-[#0D0D0D] font-semibold rounded-md transition-all duration-300

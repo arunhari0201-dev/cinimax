@@ -119,9 +119,32 @@ export const holdSeats = async (req, res) => {
       return res.status(400).json({ 
         message: `Booking not available. Cutoff time (${showtime.cutoffMinutes} minutes before showtime) has passed` 
       });
-    }    // Set expiration time (5 minutes from now)
+    }    // Set expiration time (15 minutes from now)
     const holdUntil = new Date(Date.now() + 15 * 60000); // 15 minutes
     
+    // Acquire Redis locks
+    const redisClient = req.app.get('redis');
+    const lockDurationSec = 900; // 15 minutes
+    
+    if (redisClient) {
+      const multi = redisClient.multi();
+      for (const seatId of seatIds) {
+        const lockKey = `lock:showtime:${showtimeId}:seat:${seatId}`;
+        multi.set(lockKey, userId, { NX: true, EX: lockDurationSec });
+      }
+      const results = await multi.exec();
+      const hasFailed = results.some(res => res !== 'OK');
+      if (hasFailed) {
+        // Revert locks that were successfully acquired in this batch
+        for (let i = 0; i < results.length; i++) {
+          if (results[i] === 'OK') {
+            await redisClient.del(`lock:showtime:${showtimeId}:seat:${seatIds[i]}`);
+          }
+        }
+        return res.status(409).json({ message: 'Some seats are already locked. Please select different seats.' });
+      }
+    }
+
     // Update all seats to HELD status if they are available
     const result = await Seat.updateMany(
       { 
@@ -153,6 +176,13 @@ export const holdSeats = async (req, res) => {
           } 
         }
       );
+      
+      // Clean up any acquired Redis locks
+      if (redisClient) {
+        for (const seatId of seatIds) {
+          await redisClient.del(`lock:showtime:${showtimeId}:seat:${seatId}`);
+        }
+      }
       
       return res.status(409).json({ 
         message: 'Some seats are no longer available. Please refresh and try again.',
@@ -213,6 +243,14 @@ export const releaseHeldSeats = async (req, res) => {
         } 
       }
     );
+    
+    // Clean up Redis locks
+    const redisClient = req.app.get('redis');
+    if (redisClient && showtimeId) {
+      for (const seatId of seatIds) {
+        await redisClient.del(`lock:showtime:${showtimeId}:seat:${seatId}`);
+      }
+    }
     
     // Get the updated seats
     const updatedSeats = await Seat.find({ _id: { $in: seatIds } });

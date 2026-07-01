@@ -8,6 +8,7 @@ import cookieParser from 'cookie-parser';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cron from 'node-cron';
+import { createClient } from 'redis';
 
 // Routes
 import userRoutes from './routes/user.route.js';
@@ -26,6 +27,9 @@ import stripeRoutes from './routes/stripe.route.js';
 
 // Models
 import Showtime from './models/showtime.model.js';
+import Seat, { SeatStatus } from './models/seat.model.js';
+import cookie from 'cookie';
+import jwt from 'jsonwebtoken';
 
 // Controllers for scheduled tasks
 import { archivePastShowtimes, generateNextDayShowtimes, reopenAllShowtimes } from './controllers/showtime.controller.js';
@@ -57,6 +61,30 @@ const io = new Server(httpServer, {
 // Make io accessible to routes
 app.set('io', io);
 
+// Set up Redis
+const redisClient = createClient({
+  url: process.env.REDIS_URL || 'redis://localhost:6379'
+});
+redisClient.connect()
+  .then(() => console.log('Connected to Redis'))
+  .catch((err) => console.error('Redis connection error:', err));
+app.set('redis', redisClient);
+
+const getUserIdFromSocket = (socket) => {
+  try {
+    const cookieHeader = socket.handshake.headers.cookie;
+    if (!cookieHeader) return null;
+    const cookies = cookie.parse(cookieHeader);
+    const token = cookies.access_token || cookies.token;
+    if (!token) return null;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    return decoded.id;
+  } catch (error) {
+    console.error('Socket auth error:', error.message);
+    return null;
+  }
+};
+
 // Socket.IO connection handler
 io.on('connection', (socket) => {
   console.log(`User connected: ${socket.id}`);
@@ -71,6 +99,91 @@ io.on('connection', (socket) => {
   socket.on('leaveShowtime', (showtimeId) => {
     socket.leave(`showtime-${showtimeId}`);
     console.log(`User ${socket.id} left room for showtime ${showtimeId}`);
+  });
+
+  // Handle seat holding via WebSockets
+  socket.on('holdSeat', async ({ showtimeId, seatId }) => {
+    try {
+      const userId = getUserIdFromSocket(socket);
+      if (!userId) {
+        console.warn('Socket holdSeat rejected: User not authenticated');
+        return;
+      }
+
+      console.log(`Socket holdSeat requested: User ${userId} for seat ${seatId} in showtime ${showtimeId}`);
+
+      const holdUntil = new Date(Date.now() + 15 * 60000); // 15 minutes hold
+      const lockKey = `lock:showtime:${showtimeId}:seat:${seatId}`;
+
+      // Redis check and lock
+      if (redisClient) {
+        const result = await redisClient.set(lockKey, userId, { NX: true, EX: 900 });
+        if (result !== 'OK') {
+          console.warn(`Redis lock failed: Seat ${seatId} already locked`);
+          return;
+        }
+      }
+
+      // MongoDB update
+      const updateResult = await Seat.updateOne(
+        { _id: seatId, status: SeatStatus.AVAILABLE },
+        { $set: { status: SeatStatus.HELD, holdUntil, userId } }
+      );
+
+      if (updateResult.modifiedCount === 0) {
+        // DB update failed, release Redis lock
+        if (redisClient) {
+          await redisClient.del(lockKey);
+        }
+        console.warn(`MongoDB hold failed: Seat ${seatId} status not AVAILABLE`);
+        return;
+      }
+
+      // Broadcast update
+      const updatedSeats = await Seat.find({ _id: seatId });
+      io.to(`showtime-${showtimeId}`).emit('seatsUpdated', {
+        seats: updatedSeats,
+        showtimeId
+      });
+      console.log(`Socket holdSeat success: Seat ${seatId} is now HELD`);
+    } catch (error) {
+      console.error('Socket holdSeat error:', error);
+    }
+  });
+
+  // Handle seat releasing via WebSockets
+  socket.on('releaseSeat', async ({ showtimeId, seatId }) => {
+    try {
+      const userId = getUserIdFromSocket(socket);
+      if (!userId) return;
+
+      console.log(`Socket releaseSeat requested: User ${userId} for seat ${seatId}`);
+
+      const lockKey = `lock:showtime:${showtimeId}:seat:${seatId}`;
+
+      // MongoDB update
+      const updateResult = await Seat.updateOne(
+        { _id: seatId, status: SeatStatus.HELD, userId },
+        { $set: { status: SeatStatus.AVAILABLE, holdUntil: null, userId: null } }
+      );
+
+      // Clean up Redis lock
+      if (redisClient) {
+        await redisClient.del(lockKey);
+      }
+
+      if (updateResult.modifiedCount > 0) {
+        // Broadcast update
+        const updatedSeats = await Seat.find({ _id: seatId });
+        io.to(`showtime-${showtimeId}`).emit('seatsUpdated', {
+          seats: updatedSeats,
+          showtimeId
+        });
+        console.log(`Socket releaseSeat success: Seat ${seatId} is now AVAILABLE`);
+      }
+    } catch (error) {
+      console.error('Socket releaseSeat error:', error);
+    }
   });
   
   socket.on('disconnect', () => {
